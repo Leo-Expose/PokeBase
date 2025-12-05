@@ -1,0 +1,355 @@
+{% extends 'base.html' %}
+{% block title %}PokéBase{% endblock %}
+
+{% block content %}
+{% set is_home = (data is none and not pokemon_name) %}
+<div class="card">
+  <header class="card-header">
+    <h1 class="title">
+      <a href="{{ url_for('index') }}" class="title-link">PokéBase</a>
+    </h1>
+
+    <div class="header-controls">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-icon">🌓</span>
+      </button>
+    </div>
+
+    <div class="search-shell">
+      <form method="POST" action="{{ url_for('index') }}" class="search-form" id="searchForm">
+        <input
+          type="text"
+          name="pokemon_name"
+          placeholder="Search by Pokémon name…"
+          value="{{ pokemon_name }}"
+          autocomplete="off"
+          required
+        />
+        <button type="submit">Search</button>
+      </form>
+      <div id="suggestions" class="suggestions" role="listbox" aria-label="Pokémon suggestions"></div>
+    </div>
+
+    {% if is_home %}
+    <a href="{{ url_for('random_pokemon') }}" class="random-big">
+      🎲 Random Pokémon
+    </a>
+    {% endif %}
+  </header>
+
+  {% if data %}
+  <section class="pokemon-layout" data-current-identifier="{{ data.identifier }}">
+    <div class="left-column">
+      <!-- HERO -->
+      <div class="pokemon-hero">
+        <img src="{{ data.sprite_url }}" alt="{{ data.display_name }} sprite" loading="lazy" />
+        <div class="hero-text">
+          <div class="name-row">
+            <h2>{{ data.display_name }}</h2>
+            <button type="button" id="copyLink" class="copy-link-btn" title="Copy link to this Pokémon">
+              🔗
+            </button>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-pill">No. {{ "%03d"|format(data.dex) }}</span>
+            {% if data.generation %}
+              <span class="meta-pill">{{ data.generation }}</span>
+            {% endif %}
+            {% if data.region %}
+              <span class="meta-pill">{{ data.region }} Region</span>
+            {% endif %}
+          </div>
+
+          <div class="meta-row">
+            {% if data.growth_rate %}
+              <span class="meta-pill">Growth: {{ data.growth_rate }}</span>
+            {% endif %}
+            {% if data.egg_groups %}
+              <span class="meta-pill">Egg: {{ data.egg_groups|join(', ') }}</span>
+            {% endif %}
+          </div>
+
+          <div class="chip-row">
+            {% for t in data.types %}
+              <span class="chip type-{{ t.identifier }}">{{ t.name }}</span>
+            {% endfor %}
+          </div>
+
+          {% if data.flavor_text %}
+          <p class="flavor">{{ data.flavor_text }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- ABILITIES -->
+      {% if data.abilities %}
+      <div class="panel">
+        <div class="panel-title">Abilities</div>
+        <div class="ability-list">
+          {% for ab in data.abilities %}
+          <div class="ability-row{% if ab.is_hidden %} hidden{% endif %}">
+            <div class="ability-header">
+              <span class="ability-name">{{ ab.name }}</span>
+              {% if ab.is_hidden %}
+                <span class="tag tag-hidden">Hidden Ability</span>
+              {% else %}
+                <span class="tag tag-standard">Standard</span>
+              {% endif %}
+            </div>
+            {% if ab.flavor_text %}
+            <p class="ability-text">{{ ab.flavor_text }}</p>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- FORMS -->
+      {% if data.forms %}
+      <div class="panel">
+        <div class="panel-title">Forms</div>
+        <div class="forms-row">
+          {% for f in data.forms %}
+          <a href="{{ url_for('pokemon_detail', identifier=f.identifier) }}"
+             class="form-pill{% if f.identifier == data.identifier %} current{% endif %}">
+            {{ f.name }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- EVOLUTION CHAIN -->
+      {% if data.evolutions %}
+      <div class="panel">
+        <div class="panel-title">Evolution Chain</div>
+        <div class="evo-grid">
+          {% for edge in data.evolutions %}
+          <div class="evo-edge">
+            {% if edge.from %}
+            <a href="{{ url_for('pokemon_detail', identifier=edge.from.identifier) }}"
+               class="evo-pill"
+               title="Go to {{ edge.from.name }}">
+              {{ edge.from.name }}
+            </a>
+            <span class="evo-arrow">▶</span>
+            {% endif %}
+
+            <a href="{{ url_for('pokemon_detail', identifier=edge.to.identifier) }}"
+               class="evo-pill{% if edge.to.identifier == data.identifier %} current{% endif %}"
+               title="Go to {{ edge.to.name }}">
+              {{ edge.to.name }}
+            </a>
+
+            {% if edge.condition %}
+            <span class="evo-cond">{{ edge.condition }}</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- WHERE TO FIND -->
+      {% if data.encounters %}
+      <div class="panel">
+        <div class="panel-title">Where to Find</div>
+        <div class="encounter-list">
+          {% for e in data.encounters %}
+          <div class="encounter-row">
+            <div class="enc-version">{{ e.version }}</div>
+            <div class="enc-locations">
+              {{ e.locations|join(', ') }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="right-column">
+      <!-- STATS -->
+      <div class="panel">
+        <div class="panel-title">Base Stats</div>
+        <div class="stats-list">
+          {% for stat in data.stats %}
+          <div class="stat-row">
+            <span class="stat-name">{{ stat.name }}</span>
+            <div class="stat-bar" title="Range {{ stat.min }}–{{ stat.max }}">
+              <div class="stat-bar-fill stat-{{ stat.identifier|lower|replace(' ', '-') }}" style="width: {{ stat.percent }}%;"></div>
+            </div>
+            <span class="stat-value">{{ stat.value }}</span>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="stat-total">
+          Total: {{ data.total }}
+          {% if data.capture_rate is not none %}
+            • Catch rate {{ data.capture_rate }}
+          {% endif %}
+          {% if data.base_happiness is not none %}
+            • Happiness {{ data.base_happiness }}
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- TYPE MATCHUPS -->
+      {% if data.type_matchups %}
+      <div class="panel">
+        <div class="panel-title">Type Matchups</div>
+        <div class="matchups-grid">
+          <div class="matchup-row">
+            <span class="matchup-label">Weak to</span>
+            <div class="matchup-list">
+              {% if data.type_matchups.weak %}
+                {% for t in data.type_matchups.weak %}
+                <span class="matchup-pill type-{{ t.identifier }}">
+                  {{ t.name }}
+                  <span class="mult">{{ t.label }}</span>
+                </span>
+                {% endfor %}
+              {% else %}
+                <span class="muted small">None</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="matchup-row">
+            <span class="matchup-label">Resists</span>
+            <div class="matchup-list">
+              {% if data.type_matchups.resist %}
+                {% for t in data.type_matchups.resist %}
+                <span class="matchup-pill type-{{ t.identifier }}">
+                  {{ t.name }}
+                  <span class="mult">{{ t.label }}</span>
+                </span>
+                {% endfor %}
+              {% else %}
+                <span class="muted small">None</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="matchup-row">
+            <span class="matchup-label">Immune</span>
+            <div class="matchup-list">
+              {% if data.type_matchups.immune %}
+                {% for t in data.type_matchups.immune %}
+                <span class="matchup-pill type-{{ t.identifier }}">
+                  {{ t.name }}
+                  <span class="mult">{{ t.label }}</span>
+                </span>
+                {% endfor %}
+              {% else %}
+                <span class="muted small">None</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- MOVES + DETAILS -->
+      <div class="panel">
+        <div class="panel-header-row">
+          <div class="panel-title">Moves (Black &amp; White, Level-up)</div>
+          <input id="moveFilter" class="moves-filter" type="text" placeholder="Filter moves…" />
+        </div>
+        {% if data.moves %}
+        <div class="moves-wrapper">
+          <table class="moves-table" id="movesTable">
+            <thead>
+              <tr>
+                <th>Move</th>
+                <th>Level</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for move in data.moves %}
+              <tr class="move-row"
+                  data-move-name="{{ move.name }}"
+                  data-move-type="{{ move.type_name or '' }}"
+                  data-move-type-id="{{ move.type_identifier or '' }}"
+                  data-move-cat="{{ move.category or '' }}"
+                  data-move-power="{{ move.power or '' }}"
+                  data-move-acc="{{ move.accuracy or '' }}"
+                  data-move-pp="{{ move.pp or '' }}"
+                  data-move-effect="{{ move.effect or '' }}">
+                <td>{{ move.name }}</td>
+                <td>{{ move.level }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div id="moveDetail" class="move-detail-panel">
+          <div class="move-detail-empty">Click a move to see details.</div>
+        </div>
+        {% else %}
+        <p class="muted">No moves data available.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- PREV / NEXT NAV -->
+  <section class="nav-section">
+    {% if data.nav_prev %}
+    <a href="{{ url_for('pokemon_detail', identifier=data.nav_prev.identifier) }}" class="nav-card prev">
+      <span class="nav-label">Previous</span>
+      <span class="nav-name">{{ "%03d"|format(data.nav_prev.dex) }} — {{ data.nav_prev.name }}</span>
+    </a>
+    {% else %}
+    <span class="nav-card prev disabled">
+      <span class="nav-label">Previous</span>
+      <span class="nav-name">—</span>
+    </span>
+    {% endif %}
+
+    {% if data.nav_next %}
+    <a href="{{ url_for('pokemon_detail', identifier=data.nav_next.identifier) }}" class="nav-card next">
+      <span class="nav-label">Next</span>
+      <span class="nav-name">{{ "%03d"|format(data.nav_next.dex) }} — {{ data.nav_next.name }}</span>
+    </a>
+    {% else %}
+    <span class="nav-card next disabled">
+      <span class="nav-label">Next</span>
+      <span class="nav-name">—</span>
+    </span>
+    {% endif %}
+  </section>
+
+  {% elif pokemon_name %}
+  <!-- NO SUCH POKÉMON -->
+  <section class="not-found">
+    <div class="not-found-emoji">🧐</div>
+    <h2>No Pokémon found</h2>
+    <p>Couldn’t find “{{ pokemon_name }}”.</p>
+    <p class="muted">
+      Check the spelling, use English names (e.g. <code>Pikachu</code>, <code>Charizard</code>),
+      or pick one from the suggestions while you type.
+    </p>
+  </section>
+
+  {% else %}
+  <!-- HOME PAGE -->
+  <section class="home-hero">
+    <div class="orb">
+      <div class="orb-core"></div>
+    </div>
+    <h2>Welcome to PokéBase</h2>
+    <p class="home-subtitle">
+      A local Pokédex
+    </p>
+    <div class="sample-row">
+      {% for sample in ['Pikachu','Charizard','Flareon','Garchomp','Greninja','Zekrom'] %}
+      <a href="{{ url_for('pokemon_detail', identifier=sample|lower) }}" class="sample-pill">{{ sample }}</a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
