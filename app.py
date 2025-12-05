@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 import sqlite3
 import random
-
+import os
 app = Flask(__name__)
 
-DB_PATH = "/data/pokedex.sqlite"  # adjust if needed
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "data", "pokedex.sqlite")
+
 LANG_EN = 9
 BW_VERSION_GROUP_ID = 11                # Black & White
 LEVELUP_METHOD_ID = 1                   # Level-up moves
