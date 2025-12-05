@@ -447,7 +447,7 @@ def get_pokemon_data(identifier: str):
     # Put/copy your Gen V front sprites under:
     #   static/sprites/bw/<pokemon_id>.png
     # and we’ll serve them from there.
-    sprite_url = f"/static/sprites/bw/front/{pokemon_id}.png"
+    sprite_url = f"/static/sprites/{pokemon_id}.png"
 
     # --- moves with details (BW, level-up) ------------------------------
     c.execute(
