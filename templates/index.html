@@ -17,14 +17,8 @@
 
     <div class="search-shell">
       <form method="POST" action="{{ url_for('index') }}" class="search-form" id="searchForm">
-        <input
-          type="text"
-          name="pokemon_name"
-          placeholder="Search by Pokémon name…"
-          value="{{ pokemon_name }}"
-          autocomplete="off"
-          required
-        />
+        <input type="text" name="pokemon_name" placeholder="Search by Pokémon name…" value="{{ pokemon_name }}"
+          autocomplete="off" required />
         <button type="submit">Search</button>
       </form>
       <div id="suggestions" class="suggestions" role="listbox" aria-label="Pokémon suggestions"></div>
@@ -41,7 +35,7 @@
   <section class="pokemon-layout" data-current-identifier="{{ data.identifier }}">
     <div class="left-column">
       <!-- HERO -->
-      <div class="pokemon-hero">
+      <div class="pokemon-hero{% if data.types %} type-bg-{{ data.types[0].identifier }}{% endif %}">
         <img src="{{ data.sprite_url }}" alt="{{ data.display_name }} sprite" loading="lazy" />
         <div class="hero-text">
           <div class="name-row">
@@ -53,26 +47,15 @@
 
           <div class="meta-row">
             <span class="meta-pill">No. {{ "%03d"|format(data.dex) }}</span>
-            {% if data.generation %}
-              <span class="meta-pill">{{ data.generation }}</span>
-            {% endif %}
-            {% if data.region %}
-              <span class="meta-pill">{{ data.region }} Region</span>
-            {% endif %}
-          </div>
-
-          <div class="meta-row">
-            {% if data.growth_rate %}
-              <span class="meta-pill">Growth: {{ data.growth_rate }}</span>
-            {% endif %}
-            {% if data.egg_groups %}
-              <span class="meta-pill">Egg: {{ data.egg_groups|join(', ') }}</span>
-            {% endif %}
+            {% if data.generation %}<span class="meta-pill">{{ data.generation }}</span>{% endif %}
+            {% if data.region %}<span class="meta-pill">{{ data.region }} Region</span>{% endif %}
+            {% if data.growth_rate %}<span class="meta-pill">Growth: {{ data.growth_rate }}</span>{% endif %}
+            {% if data.egg_groups %}<span class="meta-pill">Egg: {{ data.egg_groups|join(', ') }}</span>{% endif %}
           </div>
 
           <div class="chip-row">
             {% for t in data.types %}
-              <span class="chip type-{{ t.identifier }}">{{ t.name }}</span>
+            <span class="chip type-{{ t.identifier }}">{{ t.name }}</span>
             {% endfor %}
           </div>
 
@@ -92,9 +75,9 @@
             <div class="ability-header">
               <span class="ability-name">{{ ab.name }}</span>
               {% if ab.is_hidden %}
-                <span class="tag tag-hidden">Hidden Ability</span>
+              <span class="tag tag-hidden">Hidden Ability</span>
               {% else %}
-                <span class="tag tag-standard">Standard</span>
+              <span class="tag tag-standard">Standard</span>
               {% endif %}
             </div>
             {% if ab.flavor_text %}
@@ -113,7 +96,7 @@
         <div class="forms-row">
           {% for f in data.forms %}
           <a href="{{ url_for('pokemon_detail', identifier=f.identifier) }}"
-             class="form-pill{% if f.identifier == data.identifier %} current{% endif %}">
+            class="form-pill{% if f.identifier == data.identifier %} current{% endif %}">
             {{ f.name }}
           </a>
           {% endfor %}
@@ -129,17 +112,16 @@
           {% for edge in data.evolutions %}
           <div class="evo-edge">
             {% if edge.from %}
-            <a href="{{ url_for('pokemon_detail', identifier=edge.from.identifier) }}"
-               class="evo-pill"
-               title="Go to {{ edge.from.name }}">
+            <a href="{{ url_for('pokemon_detail', identifier=edge.from.identifier) }}" class="evo-pill"
+              title="Go to {{ edge.from.name }}">
               {{ edge.from.name }}
             </a>
             <span class="evo-arrow">▶</span>
             {% endif %}
 
             <a href="{{ url_for('pokemon_detail', identifier=edge.to.identifier) }}"
-               class="evo-pill{% if edge.to.identifier == data.identifier %} current{% endif %}"
-               title="Go to {{ edge.to.name }}">
+              class="evo-pill{% if edge.to.identifier == data.identifier %} current{% endif %}"
+              title="Go to {{ edge.to.name }}">
               {{ edge.to.name }}
             </a>
 
@@ -179,7 +161,8 @@
           <div class="stat-row">
             <span class="stat-name">{{ stat.name }}</span>
             <div class="stat-bar" title="Range {{ stat.min }}–{{ stat.max }}">
-              <div class="stat-bar-fill stat-{{ stat.identifier|lower|replace(' ', '-') }}" style="width: {{ stat.percent }}%;"></div>
+              <div class="stat-bar-fill stat-{{ stat.identifier|lower|replace(' ', '-') }}"
+                style="--percent: {{ stat.percent }}%;"></div>
             </div>
             <span class="stat-value">{{ stat.value }}</span>
           </div>
@@ -188,10 +171,10 @@
         <div class="stat-total">
           Total: {{ data.total }}
           {% if data.capture_rate is not none %}
-            • Catch rate {{ data.capture_rate }}
+          • Catch rate {{ data.capture_rate }}
           {% endif %}
           {% if data.base_happiness is not none %}
-            • Happiness {{ data.base_happiness }}
+          • Happiness {{ data.base_happiness }}
           {% endif %}
         </div>
       </div>
@@ -205,14 +188,14 @@
             <span class="matchup-label">Weak to</span>
             <div class="matchup-list">
               {% if data.type_matchups.weak %}
-                {% for t in data.type_matchups.weak %}
-                <span class="matchup-pill type-{{ t.identifier }}">
-                  {{ t.name }}
-                  <span class="mult">{{ t.label }}</span>
-                </span>
-                {% endfor %}
+              {% for t in data.type_matchups.weak %}
+              <span class="matchup-pill type-{{ t.identifier }}">
+                {{ t.name }}
+                <span class="mult">{{ t.label }}</span>
+              </span>
+              {% endfor %}
               {% else %}
-                <span class="muted small">None</span>
+              <span class="muted small">None</span>
               {% endif %}
             </div>
           </div>
@@ -221,14 +204,14 @@
             <span class="matchup-label">Resists</span>
             <div class="matchup-list">
               {% if data.type_matchups.resist %}
-                {% for t in data.type_matchups.resist %}
-                <span class="matchup-pill type-{{ t.identifier }}">
-                  {{ t.name }}
-                  <span class="mult">{{ t.label }}</span>
-                </span>
-                {% endfor %}
+              {% for t in data.type_matchups.resist %}
+              <span class="matchup-pill type-{{ t.identifier }}">
+                {{ t.name }}
+                <span class="mult">{{ t.label }}</span>
+              </span>
+              {% endfor %}
               {% else %}
-                <span class="muted small">None</span>
+              <span class="muted small">None</span>
               {% endif %}
             </div>
           </div>
@@ -237,14 +220,14 @@
             <span class="matchup-label">Immune</span>
             <div class="matchup-list">
               {% if data.type_matchups.immune %}
-                {% for t in data.type_matchups.immune %}
-                <span class="matchup-pill type-{{ t.identifier }}">
-                  {{ t.name }}
-                  <span class="mult">{{ t.label }}</span>
-                </span>
-                {% endfor %}
+              {% for t in data.type_matchups.immune %}
+              <span class="matchup-pill type-{{ t.identifier }}">
+                {{ t.name }}
+                <span class="mult">{{ t.label }}</span>
+              </span>
+              {% endfor %}
               {% else %}
-                <span class="muted small">None</span>
+              <span class="muted small">None</span>
               {% endif %}
             </div>
           </div>
@@ -269,15 +252,10 @@
             </thead>
             <tbody>
               {% for move in data.moves %}
-              <tr class="move-row"
-                  data-move-name="{{ move.name }}"
-                  data-move-type="{{ move.type_name or '' }}"
-                  data-move-type-id="{{ move.type_identifier or '' }}"
-                  data-move-cat="{{ move.category or '' }}"
-                  data-move-power="{{ move.power or '' }}"
-                  data-move-acc="{{ move.accuracy or '' }}"
-                  data-move-pp="{{ move.pp or '' }}"
-                  data-move-effect="{{ move.effect or '' }}">
+              <tr class="move-row" data-move-name="{{ move.name }}" data-move-type="{{ move.type_name or '' }}"
+                data-move-type-id="{{ move.type_identifier or '' }}" data-move-cat="{{ move.category or '' }}"
+                data-move-power="{{ move.power or '' }}" data-move-acc="{{ move.accuracy or '' }}"
+                data-move-pp="{{ move.pp or '' }}" data-move-effect="{{ move.effect or '' }}">
                 <td>{{ move.name }}</td>
                 <td>{{ move.level }}</td>
               </tr>

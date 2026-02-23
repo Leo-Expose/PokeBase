@@ -185,16 +185,16 @@ def get_pokemon_data(identifier: str):
     mins_maxs = {r["stat_id"]: (r["lo"], r["hi"]) for r in c.fetchall()}
 
     # For bars: use a fixed visual max so low stats don't look microscopic
-    MAX_STAT_VIS = 180  # tweak if you want; 180 feels nice visually
+    MAX_STAT_VIS = 180
 
     stats, total = [], 0
     for row in stat_rows:
         lo, hi = mins_maxs.get(row["stat_id"], (0, 255))
         base_val = row["base_stat"]
 
-        pct = int(base_val / MAX_STAT_VIS * 100) if MAX_STAT_VIS else 0
+        pct = int((base_val / MAX_STAT_VIS) * 100) if MAX_STAT_VIS else 0
         # clamp for aesthetics
-        pct = max(5, min(pct, 100))
+        pct = max(0, min(pct, 100))
 
         stats.append(
             {
@@ -465,6 +465,7 @@ def get_pokemon_data(identifier: str):
             m.power,
             m.accuracy,
             m.pp,
+            m.effect_chance,
             mep.short_effect
         FROM pokemon_moves pm
         JOIN moves m ON m.id = pm.move_id
@@ -503,7 +504,7 @@ def get_pokemon_data(identifier: str):
                 "power": r["power"],
                 "accuracy": r["accuracy"],
                 "pp": r["pp"],
-                "effect": effect,
+                "effect": (effect.replace("$effect_chance", str(r["effect_chance"] or ""))),
             }
         )
 
@@ -585,9 +586,10 @@ def get_pokemon_data(identifier: str):
     c.execute(
         """
         SELECT ps.id AS species_id,
-               ps.identifier,
+               p.identifier,
                psn.name AS name
         FROM pokemon_species ps
+        JOIN pokemon p ON p.species_id = ps.id AND p.is_default = 1
         JOIN pokemon_species_names psn
              ON psn.pokemon_species_id = ps.id
             AND psn.local_language_id = ?
@@ -608,9 +610,10 @@ def get_pokemon_data(identifier: str):
     c.execute(
         """
         SELECT ps.id AS species_id,
-               ps.identifier,
+               p.identifier,
                psn.name AS name
         FROM pokemon_species ps
+        JOIN pokemon p ON p.species_id = ps.id AND p.is_default = 1
         JOIN pokemon_species_names psn
              ON psn.pokemon_species_id = ps.id
             AND psn.local_language_id = ?

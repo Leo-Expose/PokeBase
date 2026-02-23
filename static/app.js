@@ -131,6 +131,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---- keyboard shortcuts ----
   document.addEventListener("keydown", (e) => {
+    // Ignore key commands if user is typing in the move filter
+    const isEditingFilter = moveFilter && document.activeElement === moveFilter;
+    if (isEditingFilter) return;
+
     if (e.key === "/" && document.activeElement !== input) {
       e.preventDefault();
       input && input.focus();
@@ -139,6 +143,9 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       input && input.focus();
     }
+
+    // Ignore prev/next if input is focused
+    if (document.activeElement === input) return;
 
     // prev / next with arrow keys
     const navPrev = document.querySelector(".nav-card.prev:not(.disabled)");
