@@ -298,10 +298,16 @@ h6 {
   position: relative;
 }
 
-.search-form input[type="text"] {
+.search-input-wrapper {
+  position: relative;
   flex: 1;
-  min-width: 0;
-  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+}
+
+.search-form input[type="text"] {
+  width: 100%;
+  padding: 14px 44px 14px 20px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-soft);
   background: rgba(var(--bg-surface3), 0.5);
@@ -312,6 +318,27 @@ h6 {
   text-transform: capitalize;
   transition: all var(--transition-fast);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 4px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+  z-index: 2;
+  line-height: 1;
+}
+
+.clear-search-btn:hover {
+  color: var(--accent);
 }
 
 .search-form input[type="text"]::placeholder {

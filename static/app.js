@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const movesTable = document.getElementById("movesTable");
   const moveDetail = document.getElementById("moveDetail");
   const copyLinkBtn = document.getElementById("copyLink");
+  const clearSearchBtn = document.getElementById("clearSearch");
   const layout = document.querySelector(".pokemon-layout");
 
   // ---- theme toggle (Catppuccin Mocha / Latte) ----
@@ -77,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
           activeIndex = -1;
           updateActiveItem();
         })
-        .catch(() => {});
+        .catch(() => { });
     });
 
     input.addEventListener("keydown", (e) => {
@@ -126,6 +127,22 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", () => {
       submitBtn.classList.add("loading");
       submitBtn.disabled = true;
+    });
+  }
+
+  // ---- clear search ----
+  if (input && clearSearchBtn) {
+    const toggleClear = () => {
+      clearSearchBtn.style.display = input.value ? "flex" : "none";
+    };
+    input.addEventListener("input", toggleClear);
+    toggleClear();
+
+    clearSearchBtn.addEventListener("click", () => {
+      input.value = "";
+      input.focus();
+      toggleClear();
+      if (typeof clearSuggestions === "function") clearSuggestions();
     });
   }
 
@@ -192,11 +209,10 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="move-detail">
         <div class="move-detail-header">
           <span class="move-detail-name">${name}</span>
-          ${
-            typeName
-              ? `<span class="chip tiny type-${typeId}">${typeName}</span>`
-              : ""
-          }
+          ${typeName
+        ? `<span class="chip tiny type-${typeId}">${typeName}</span>`
+        : ""
+      }
         </div>
         <div class="move-detail-meta">
           <span>Category: ${cat || "—"}</span>

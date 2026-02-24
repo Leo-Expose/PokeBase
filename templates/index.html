@@ -47,10 +47,21 @@
 
           <div class="meta-row">
             <span class="meta-pill">No. {{ "%03d"|format(data.dex) }}</span>
-            {% if data.generation %}<span class="meta-pill">{{ data.generation }}</span>{% endif %}
-            {% if data.region %}<span class="meta-pill">{{ data.region }} Region</span>{% endif %}
-            {% if data.growth_rate %}<span class="meta-pill">Growth: {{ data.growth_rate }}</span>{% endif %}
-            {% if data.egg_groups %}<span class="meta-pill">Egg: {{ data.egg_groups|join(', ') }}</span>{% endif %}
+            {% if data.generation %}
+            <span class="meta-pill">{{ data.generation }}</span>
+            {% endif %}
+            {% if data.region %}
+            <span class="meta-pill">{{ data.region }} Region</span>
+            {% endif %}
+          </div>
+
+          <div class="meta-row">
+            {% if data.growth_rate %}
+            <span class="meta-pill">Growth: {{ data.growth_rate }}</span>
+            {% endif %}
+            {% if data.egg_groups %}
+            <span class="meta-pill">Egg: {{ data.egg_groups|join(', ') }}</span>
+            {% endif %}
           </div>
 
           <div class="chip-row">
@@ -329,13 +340,5 @@
     </div>
   </section>
   {% endif %}
-
-  <footer class="footer">
-    <div class="footer-content">
-      <p>&copy; 2026 PokéBase • Data from PokeAPI • <span class="accent-text">Premium Catppuccin Experience</span></p>
-    </div>
-  </footer>
-
-  <button id="backToTop" class="back-to-top" title="Back to Top">↑</button>
 </div>
 {% endblock %}
