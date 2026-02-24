@@ -508,9 +508,16 @@ h6 {
 .pokemon-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
-  gap: 24px;
-  margin-top: 12px;
+  gap: 32px;
+  margin-top: 24px;
   align-items: start;
+}
+
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
 
 /* Animation for entering panels */
@@ -1189,14 +1196,16 @@ h6 {
 }
 
 .stat-total {
-  margin-top: 16px;
-  font-size: 0.85rem;
-  padding: 10px 16px;
+  margin-top: 20px;
+  font-size: 0.95rem;
+  padding: 12px 20px;
   border-radius: var(--radius-md);
-  background: rgba(var(--bg-main), 0.5);
+  background: var(--bg-surface2);
   border: 1px solid var(--border-soft);
   display: inline-block;
-  font-weight: 500;
+  font-weight: 600;
+  box-shadow: var(--shadow-soft);
+  color: var(--accent);
 }
 
 /* Type matchups */
@@ -1867,4 +1876,63 @@ h6 {
   .search-form button {
     padding: 12px 24px;
   }
+}
+
+/* FOOTER ------------------------------------------------------------- */
+.footer {
+  margin-top: 60px;
+  padding: 40px 20px;
+  text-align: center;
+  border-top: 1px solid var(--border-soft);
+  background: rgba(var(--bg-surface), 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.footer-content p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.accent-text {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Back to Top button */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg-main);
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px var(--accent-soft);
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-smooth);
+  z-index: 1000;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-5px);
+  filter: brightness(1.1);
+  box-shadow: 0 8px 25px var(--accent-soft);
+}
+
+.back-to-top:active {
+  transform: translateY(0);
 }
