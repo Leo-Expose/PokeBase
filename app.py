@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 import sqlite3
 import random
 import os
+import re
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -256,6 +257,7 @@ def get_pokemon_data(identifier: str):
     abilities = []
     for r in c.fetchall():
         text = (r["flavor_text"] or "").replace("\n", " ").replace("\f", " ")
+        text = re.sub(r'\[([^\]]+)\]\{[^}]+\}', r'\1', text)
         abilities.append(
             {
                 "identifier": r["identifier"],
@@ -494,6 +496,9 @@ def get_pokemon_data(identifier: str):
     moves = []
     for r in c.fetchall():
         effect = (r["short_effect"] or "").replace("\n", " ").replace("\f", " ")
+        effect = re.sub(r'\[([^\]]+)\]\{[^}]+\}', r'\1', effect)
+        effect = effect.replace("$effect_chance", str(r["effect_chance"] or ""))
+        
         moves.append(
             {
                 "name": r["move_name"].replace("-", " ").title(),
@@ -504,7 +509,7 @@ def get_pokemon_data(identifier: str):
                 "power": r["power"],
                 "accuracy": r["accuracy"],
                 "pp": r["pp"],
-                "effect": (effect.replace("$effect_chance", str(r["effect_chance"] or ""))),
+                "effect": effect,
             }
         )
 
