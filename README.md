@@ -1,19 +1,16 @@
 
 # PokeBase
 
-A self-hosted Pokédex application, up to date through Gen 7.  
-The database was created using CSVs from [Veekun](https://github.com/veekun/pokedex).
+A self-hosted Pokédex application, featuring a complete UI overhaul, new features, and up-to-date support through Gen 9 alongside a brand new database.
 
 ## How to Run
 
 1. **Clone the repository**
-> Note: The `master` branch does not contain the database or sprites to keep the repository lightweight for cloning. 
-> To see a working live version with all assets deployed on Vercel, check out the `dev` branch.
 
-````bash
+```bash
 git clone https://github.com/Leo-Expose/PokeBase.git
 cd PokeBase
-````
+```
 
 2. **Install Python requirements**
 
