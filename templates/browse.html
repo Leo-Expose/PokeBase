@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Browse Pokémon — PokeBase{% endblock %}
+{% block description %}Browse all Pokémon by generation and type. Filter and explore the complete Pokédex.{% endblock %}
+
+{% block content %}
+<div class="section-header">
+  <h1>Browse Pokémon</h1>
+  <span class="text-secondary">{{ data.total }} Pokémon found</span>
+</div>
+
+<form class="filter-bar" method="GET" action="/browse">
+  <label>Generation:</label>
+  <select name="gen" onchange="this.form.submit()">
+    <option value="all" {% if gen == 'all' %}selected{% endif %}>All Gens</option>
+    {% for i in range(1, 10) %}
+      <option value="{{ i }}" {% if gen == i|string %}selected{% endif %}>Gen {{ i }}</option>
+    {% endfor %}
+  </select>
+  <label>Type:</label>
+  <select name="type" onchange="this.form.submit()">
+    <option value="all" {% if type_ == 'all' %}selected{% endif %}>All Types</option>
+    {% set all_types = ['normal','fire','water','electric','grass','ice','fighting','poison','ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy'] %}
+    {% for t in all_types %}
+      <option value="{{ t }}" {% if type_ == t %}selected{% endif %}>{{ t|title }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<div class="pokemon-grid">
+  {% for p in data.pokemon %}
+    <a href="/pokemon/{{ p.name }}" class="card pokemon-card" id="pokemon-{{ p.name }}">
+      <img
+        src="/static/sprites/{{ p.species_id }}.png"
+        onerror="
+          if(this.src.includes('/sprites/') && !this.src.includes('official-artwork')) {
+            this.src='/static/sprites/official-artwork/' + {{ p.species_id }} + '.png';
+          } else {
+            this.onerror=null;
+          }
+        "
+        alt="{{ p.name }}"
+        loading="lazy"
+      >
+      <span class="dex-number">#{{ '%03d'|format(p.species_id) }}</span>
+      <span class="name">{{ p.name|replace('-',' ') }}</span>
+      <div class="types">
+        {% for t in p.types_list %}
+          {% if t %}<span class="type-badge {{ t }}">{{ t }}</span>{% endif %}
+        {% endfor %}
+      </div>
+    </a>
+  {% endfor %}
+</div>
+
+{% if data.total_pages > 1 %}
+  <div class="pagination">
+    {% if page > 1 %}
+      <a href="/browse?gen={{ gen }}&type={{ type_ }}&page={{ page - 1 }}">← Prev</a>
+    {% else %}
+      <span class="disabled">← Prev</span>
+    {% endif %}
+
+    {% set start_page = [1, page - 2]|max %}
+    {% set end_page = [data.total_pages, page + 2]|min %}
+
+    {% if start_page > 1 %}
+      <a href="/browse?gen={{ gen }}&type={{ type_ }}&page=1">1</a>
+      {% if start_page > 2 %}<span>…</span>{% endif %}
+    {% endif %}
+
+    {% for p in range(start_page, end_page + 1) %}
+      {% if p == page %}
+        <span class="active">{{ p }}</span>
+      {% else %}
+        <a href="/browse?gen={{ gen }}&type={{ type_ }}&page={{ p }}">{{ p }}</a>
+      {% endif %}
+    {% endfor %}
+
+    {% if end_page < data.total_pages %}
+      {% if end_page < data.total_pages - 1 %}<span>…</span>{% endif %}
+      <a href="/browse?gen={{ gen }}&type={{ type_ }}&page={{ data.total_pages }}">{{ data.total_pages }}</a>
+    {% endif %}
+
+    {% if page < data.total_pages %}
+      <a href="/browse?gen={{ gen }}&type={{ type_ }}&page={{ page + 1 }}">Next →</a>
+    {% else %}
+      <span class="disabled">Next →</span>
+    {% endif %}
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Not Found — PokeBase{% endblock %}
+
+{% block content %}
+<div class="error-page">
+  <h1>404</h1>
+  <p>
+    {% if identifier %}
+      Pokémon <strong>"{{ identifier }}"</strong> not found in the Pokédex.
+    {% else %}
+      Page not found.
+    {% endif %}
+  </p>
+  <div class="hero-actions">
+    <a href="/" class="btn btn-primary">🏠 Home</a>
+    <a href="/browse" class="btn btn-outline">📋 Browse All</a>
+    <a href="/random" class="btn btn-outline">🎲 Random</a>
+  </div>
+</div>
+{% endblock %}

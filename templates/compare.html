@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Compare Pokémon — PokeBase{% endblock %}
+{% block description %}Compare two Pokémon side by side — stats, types, abilities, and more.{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 24px;">Compare Pokémon</h1>
+
+<div class="compare-layout">
+  <!-- Pokémon A -->
+  <div class="compare-panel">
+    <div class="compare-search">
+      <input type="text" id="compare-search-a" placeholder="Search first Pokémon..."
+             value="{{ a.display_name if a else '' }}" autocomplete="off">
+      <ul id="compare-dropdown-a" class="search-dropdown hidden"></ul>
+    </div>
+    {% if a %}
+      <div class="card" style="padding: 24px;">
+        <div style="text-align:center">
+          <img class="detail-sprite"
+               src="/static/sprites/official-artwork/{{ a.id }}.png"
+               onerror="if(this.src.includes('official-artwork')){this.src='/static/sprites/{{ a.id }}.png';}else{this.onerror=null;}"
+               alt="{{ a.display_name }}">
+          <h2 style="margin-top:12px;">{{ a.display_name }}</h2>
+          <span class="text-muted">#{{ '%03d'|format(a.dex) }}</span>
+          <div class="detail-types" style="justify-content:center; margin:10px 0;">
+            {% for t in a.types %}
+              <span class="type-badge {{ t }}">{{ t }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% set stat_labels = {'hp': 'HP', 'attack': 'Attack', 'defense': 'Defense', 'special-attack': 'Sp. Atk', 'special-defense': 'Sp. Def', 'speed': 'Speed'} %}
+        {% set stat_classes = {'hp': 'hp', 'attack': 'attack', 'defense': 'defense', 'special-attack': 'sp-atk', 'special-defense': 'sp-def', 'speed': 'speed'} %}
+        {% for s in a.stats %}
+          <div class="stat-row">
+            <span class="stat-name">{{ stat_labels.get(s.stat_name, s.stat_name) }}</span>
+            <span class="stat-value">{{ s.base_stat }}</span>
+            <div class="stat-bar-outer">
+              <div class="stat-bar-inner {{ stat_classes.get(s.stat_name, '') }}" style="width: {{ s.percent }}%"></div>
+            </div>
+            <span></span>
+          </div>
+        {% endfor %}
+        <div class="stat-total">
+          <span>Total</span>
+          <span>{{ a.total_bst }}</span>
+        </div>
+        <div class="ability-list" style="margin-top:16px;">
+          {% for ab in a.abilities %}
+            <div class="ability-item">
+              <span class="ability-name">{{ ab.ability_name }}</span>
+              {% if ab.is_hidden %}<span class="ability-hidden">(Hidden)</span>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="card compare-empty">
+        <p>🔍 Search for a Pokémon</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Pokémon B -->
+  <div class="compare-panel">
+    <div class="compare-search">
+      <input type="text" id="compare-search-b" placeholder="Search second Pokémon..."
+             value="{{ b.display_name if b else '' }}" autocomplete="off">
+      <ul id="compare-dropdown-b" class="search-dropdown hidden"></ul>
+    </div>
+    {% if b %}
+      <div class="card" style="padding: 24px;">
+        <div style="text-align:center">
+          <img class="detail-sprite"
+               src="/static/sprites/official-artwork/{{ b.id }}.png"
+               onerror="if(this.src.includes('official-artwork')){this.src='/static/sprites/{{ b.id }}.png';}else{this.onerror=null;}"
+               alt="{{ b.display_name }}">
+          <h2 style="margin-top:12px;">{{ b.display_name }}</h2>
+          <span class="text-muted">#{{ '%03d'|format(b.dex) }}</span>
+          <div class="detail-types" style="justify-content:center; margin:10px 0;">
+            {% for t in b.types %}
+              <span class="type-badge {{ t }}">{{ t }}</span>
+            {% endfor %}
+          </div>
+        </div>
+        {% for s in b.stats %}
+          <div class="stat-row">
+            <span class="stat-name">{{ stat_labels.get(s.stat_name, s.stat_name) }}</span>
+            <span class="stat-value">{{ s.base_stat }}</span>
+            <div class="stat-bar-outer">
+              <div class="stat-bar-inner {{ stat_classes.get(s.stat_name, '') }}" style="width: {{ s.percent }}%"></div>
+            </div>
+            <span></span>
+          </div>
+        {% endfor %}
+        <div class="stat-total">
+          <span>Total</span>
+          <span>{{ b.total_bst }}</span>
+        </div>
+        <div class="ability-list" style="margin-top:16px;">
+          {% for ab in b.abilities %}
+            <div class="ability-item">
+              <span class="ability-name">{{ ab.ability_name }}</span>
+              {% if ab.is_hidden %}<span class="ability-hidden">(Hidden)</span>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="card compare-empty">
+        <p>🔍 Search for a Pokémon</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Override compare search to navigate with query params
+  document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    function setupCompareSearch(inputId, dropdownId, paramName) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      if (!input || !dropdown) return;
+
+      // Override the click handler for compare dropdowns
+      const observer = new MutationObserver(() => {
+        dropdown.querySelectorAll('li').forEach(li => {
+          li.onclick = () => {
+            const name = li.dataset.name;
+            const otherParam = paramName === 'a' ? 'b' : 'a';
+            const otherVal = urlParams.get(otherParam) || '';
+            window.location.href = `/compare?${paramName}=${name}&${otherParam}=${otherVal}`;
+          };
+        });
+      });
+      observer.observe(dropdown, { childList: true });
+    }
+
+    setupCompareSearch('compare-search-a', 'compare-dropdown-a', 'a');
+    setupCompareSearch('compare-search-b', 'compare-dropdown-b', 'b');
+  });
+</script>
+{% endblock %}

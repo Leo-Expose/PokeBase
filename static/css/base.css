@@ -1,0 +1,302 @@
+/* ══════════════════════════════════════════════════════════════════════
+   base.css — PokeBase Theme System
+   CSS Custom Properties for 3 themes × 2 modes
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { line-height: 1.6; min-height: 100vh; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+ul, ol { list-style: none; }
+button { cursor: pointer; border: none; background: none; font: inherit; }
+input, select { font: inherit; }
+
+/* ── Type Colors ── */
+:root {
+  --type-normal: #A8A77A;
+  --type-fire: #EE8130;
+  --type-water: #6390F0;
+  --type-electric: #F7D02C;
+  --type-grass: #7AC74C;
+  --type-ice: #96D9D6;
+  --type-fighting: #C22E28;
+  --type-poison: #A33EA1;
+  --type-ground: #E2BF65;
+  --type-flying: #A98FF3;
+  --type-psychic: #F95587;
+  --type-bug: #A6B91A;
+  --type-rock: #B6A136;
+  --type-ghost: #735797;
+  --type-dragon: #6F35FC;
+  --type-dark: #705746;
+  --type-steel: #B7B7CE;
+  --type-fairy: #D685AD;
+  
+  /* Stat colors */
+  --stat-hp: #ff5959;
+  --stat-attack: #f5ac78;
+  --stat-defense: #fae078;
+  --stat-sp-atk: #9db7f5;
+  --stat-sp-def: #a7db8d;
+  --stat-speed: #fa92b2;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   DEFAULT THEME (Pokédex Red)
+   ══════════════════════════════════════════════════════════════════════ */
+
+[data-theme="default"][data-mode="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7f7f8;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fafafa;
+  --text-primary: #1a1a2e;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --accent: #dc2626;
+  --accent-hover: #b91c1c;
+  --accent-soft: rgba(220,38,38,0.08);
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
+  --stat-bar: #dc2626;
+  --badge-bg: rgba(220,38,38,0.1);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --navbar-bg: rgba(255,255,255,0.85);
+  --navbar-border: #e2e8f0;
+  --input-bg: #f1f5f9;
+  --input-border: #e2e8f0;
+  --input-focus: #dc2626;
+  --dropdown-bg: #ffffff;
+}
+
+[data-theme="default"][data-mode="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-card-hover: #263548;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #ef4444;
+  --accent-hover: #f87171;
+  --accent-soft: rgba(239,68,68,0.12);
+  --border: #334155;
+  --border-light: #1e293b;
+  --stat-bar: #ef4444;
+  --badge-bg: rgba(239,68,68,0.15);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.4);
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --navbar-bg: rgba(15,23,42,0.9);
+  --navbar-border: #334155;
+  --input-bg: #334155;
+  --input-border: #475569;
+  --input-focus: #ef4444;
+  --dropdown-bg: #1e293b;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   GEN4 THEME (Diamond/Pearl Inspired)
+   ══════════════════════════════════════════════════════════════════════ */
+
+[data-theme="gen4"][data-mode="light"] {
+  --bg-primary: #dce8f5;
+  --bg-secondary: #c4d8f0;
+  --bg-card: #eaf1fa;
+  --bg-card-hover: #d8e6f5;
+  --text-primary: #1a2a4a;
+  --text-secondary: #3a5a8a;
+  --text-muted: #6888b8;
+  --accent: #3050b8;
+  --accent-hover: #2040a8;
+  --accent-soft: rgba(48,80,184,0.1);
+  --border: #8aaad8;
+  --border-light: #b8d4f0;
+  --stat-bar: #3050b8;
+  --badge-bg: rgba(48,80,184,0.12);
+  --shadow-sm: 2px 2px 0px #8aaad8;
+  --shadow-md: 3px 3px 0px #7898c8;
+  --shadow-lg: 4px 4px 0px #6888b8;
+  --font-main: 'Press Start 2P', monospace;
+  --font-display: 'Press Start 2P', monospace;
+  --radius: 4px;
+  --radius-sm: 2px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --navbar-bg: rgba(200,220,245,0.95);
+  --navbar-border: #8aaad8;
+  --input-bg: #eaf1fa;
+  --input-border: #8aaad8;
+  --input-focus: #3050b8;
+  --dropdown-bg: #eaf1fa;
+}
+
+[data-theme="gen4"][data-mode="dark"] {
+  --bg-primary: #0a0f1e;
+  --bg-secondary: #111828;
+  --bg-card: #1a2238;
+  --bg-card-hover: #223050;
+  --text-primary: #d0e8ff;
+  --text-secondary: #7aaad8;
+  --text-muted: #4a7aaa;
+  --accent: #5a90e8;
+  --accent-hover: #7aaeee;
+  --accent-soft: rgba(90,144,232,0.15);
+  --border: #2a4080;
+  --border-light: #1a2a50;
+  --stat-bar: #5a90e8;
+  --badge-bg: rgba(90,144,232,0.2);
+  --shadow-sm: 2px 2px 0px #2a4080;
+  --shadow-md: 3px 3px 0px #203060;
+  --shadow-lg: 4px 4px 0px #1a2850;
+  --font-main: 'Press Start 2P', monospace;
+  --font-display: 'Press Start 2P', monospace;
+  --radius: 4px;
+  --radius-sm: 2px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --navbar-bg: rgba(10,15,30,0.95);
+  --navbar-border: #2a4080;
+  --input-bg: #1a2238;
+  --input-border: #2a4080;
+  --input-focus: #5a90e8;
+  --dropdown-bg: #1a2238;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   FUTURE THEME (Gen 6+ / Modern Violet)
+   ══════════════════════════════════════════════════════════════════════ */
+
+[data-theme="future"][data-mode="light"] {
+  --bg-primary: #f8f9ff;
+  --bg-secondary: #eef0ff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5f3ff;
+  --text-primary: #18183a;
+  --text-secondary: #6060a0;
+  --text-muted: #9090c0;
+  --accent: #7c4dff;
+  --accent-hover: #651fff;
+  --accent-soft: rgba(124,77,255,0.08);
+  --border: #d0d0f0;
+  --border-light: #e8e8ff;
+  --stat-bar: #7c4dff;
+  --badge-bg: rgba(124,77,255,0.1);
+  --shadow-sm: 0 2px 8px rgba(124,77,255,0.08);
+  --shadow-md: 0 4px 20px rgba(124,77,255,0.12);
+  --shadow-lg: 0 8px 40px rgba(124,77,255,0.18);
+  --font-main: 'Exo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Exo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-lg: 28px;
+  --radius-xl: 36px;
+  --navbar-bg: rgba(248,249,255,0.85);
+  --navbar-border: #d0d0f0;
+  --input-bg: #eef0ff;
+  --input-border: #d0d0f0;
+  --input-focus: #7c4dff;
+  --dropdown-bg: #ffffff;
+}
+
+[data-theme="future"][data-mode="dark"] {
+  --bg-primary: #0d0d1a;
+  --bg-secondary: #12122a;
+  --bg-card: #1a1a35;
+  --bg-card-hover: #222248;
+  --text-primary: #e8e8ff;
+  --text-secondary: #9090cc;
+  --text-muted: #6060a0;
+  --accent: #b388ff;
+  --accent-hover: #d0aeff;
+  --accent-soft: rgba(179,136,255,0.12);
+  --border: #2a2a55;
+  --border-light: #1a1a40;
+  --stat-bar: #b388ff;
+  --badge-bg: rgba(179,136,255,0.2);
+  --shadow-sm: 0 2px 8px rgba(179,136,255,0.1);
+  --shadow-md: 0 4px 20px rgba(179,136,255,0.2);
+  --shadow-lg: 0 8px 40px rgba(179,136,255,0.3);
+  --font-main: 'Exo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Exo 2', -apple-system, BlinkMacSystemFont, sans-serif;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --radius-lg: 28px;
+  --radius-xl: 36px;
+  --navbar-bg: rgba(13,13,26,0.9);
+  --navbar-border: #2a2a55;
+  --input-bg: #1a1a35;
+  --input-border: #2a2a55;
+  --input-focus: #b388ff;
+  --dropdown-bg: #1a1a35;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   Base Styles
+   ══════════════════════════════════════════════════════════════════════ */
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 20px 40px;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+/* Gen4 font size adjustment — Press Start 2P is very large at normal sizes */
+[data-theme="gen4"] h1 { font-size: 1.2rem; }
+[data-theme="gen4"] h2 { font-size: 1rem; }
+[data-theme="gen4"] h3 { font-size: 0.85rem; }
+[data-theme="gen4"] body { font-size: 0.7rem; line-height: 1.8; }
+[data-theme="gen4"] .nav-logo { font-size: 0.8rem; }
+[data-theme="gen4"] .nav-link { font-size: 0.6rem; }
+[data-theme="gen4"] input, [data-theme="gen4"] select { font-size: 0.7rem; }
+
+/* ── Utilities ── */
+.text-muted { color: var(--text-muted); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent); }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
