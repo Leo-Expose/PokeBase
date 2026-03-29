@@ -7,7 +7,10 @@ The database was created using CSVs from [Veekun](https://github.com/veekun/poke
 ## How to Run
 
 1. **Clone the repository**
-````
+> Note: The `master` branch does not contain the database or sprites to keep the repository lightweight for cloning. 
+> To see a working live version with all assets deployed on Vercel, check out the `dev` branch.
+
+````bash
 git clone https://github.com/Leo-Expose/PokeBase.git
 cd PokeBase
 ````
