@@ -1,2 +1,8 @@
 __pycache__/
 .venv/
+data/
+static/sprites/
+*.db
+*.sqlite
+*.sqlite3
+
