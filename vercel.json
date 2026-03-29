@@ -2,14 +2,12 @@
   "builds": [
     {
       "src": "app.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "excludeFiles": "static/sprites/**"
+      }
     }
   ],
-  "functions": {
-    "app.py": {
-      "excludeFiles": "static/sprites/**"
-    }
-  },
   "routes": [
     {
       "src": "/static/(.*)",
