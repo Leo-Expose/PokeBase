@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Type Calculator — PokeBase{% endblock %}
+{% block description %}Calculate type effectiveness for any attacking and defending type combination.{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 24px;">Type Calculator</h1>
+
+<div class="calc-layout">
+  <!-- Offensive Calculator -->
+  <div class="card calc-section">
+    <h2>⚔️ Offensive Calculator</h2>
+    <p class="text-secondary" style="font-size:0.85rem; margin-bottom:16px;">
+      How effective is an attack type against a defending Pokémon?
+    </p>
+    <div class="calc-row">
+      <label>Attack Type:</label>
+      <select id="atk-type"></select>
+    </div>
+    <div class="calc-row">
+      <label>Defender Type 1:</label>
+      <select id="def-type1"></select>
+    </div>
+    <div class="calc-row">
+      <label>Defender Type 2:</label>
+      <select id="def-type2"></select>
+    </div>
+    <div class="calc-result" id="calc-result">
+      <div class="multiplier normal">×1</div>
+      <div class="category-label">Select types to calculate</div>
+    </div>
+  </div>
+
+  <!-- Defensive Chart -->
+  <div class="card calc-section">
+    <h2>🛡️ Defensive Chart</h2>
+    <p class="text-secondary" style="font-size:0.85rem; margin-bottom:16px;">
+      See all weaknesses, resistances, and immunities for a type combination.
+    </p>
+    <div class="calc-row">
+      <label>Type 1:</label>
+      <select id="chart-type1"></select>
+    </div>
+    <div class="calc-row">
+      <label>Type 2:</label>
+      <select id="chart-type2"></select>
+    </div>
+    <div id="defensive-chart">
+      <p class="text-muted" style="text-align:center; padding:20px;">Select types to see matchups</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/type_calc.js') }}"></script>
+{% endblock %}

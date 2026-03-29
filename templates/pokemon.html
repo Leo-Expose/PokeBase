@@ -1,0 +1,366 @@
+{% extends "base.html" %}
+{% block title %}{{ data.display_name }} #{{ '%03d'|format(data.dex) }} — PokeBase{% endblock %}
+{% block description %}{{ data.display_name }} — {{ data.species.genus or '' }}. View stats, moves, abilities, and type matchups.{% endblock %}
+
+{% block content %}
+<!-- Navigation -->
+<div class="detail-nav">
+  {% if data.nav_prev %}
+    <a href="/pokemon/{{ data.nav_prev.name }}">
+      ← #{{ '%03d'|format(data.nav_prev.dex) }} {{ data.nav_prev.name|replace('-',' ')|title }}
+    </a>
+  {% else %}
+    <span></span>
+  {% endif %}
+  {% if data.nav_next %}
+    <a href="/pokemon/{{ data.nav_next.name }}">
+      #{{ '%03d'|format(data.nav_next.dex) }} {{ data.nav_next.name|replace('-',' ')|title }} →
+    </a>
+  {% else %}
+    <span></span>
+  {% endif %}
+</div>
+
+<!-- Header -->
+<div class="detail-header">
+  <div class="detail-sprite-area">
+    <img
+      class="detail-sprite"
+      id="main-sprite"
+      src="/static/sprites/official-artwork/{{ data.id }}.png"
+      data-pid="{{ data.id }}"
+      onerror="
+        if (this.src.includes('official-artwork/shiny')) {
+          this.src = '/static/sprites/shiny/' + this.dataset.pid + '.png';
+        } else if (this.src.includes('official-artwork')) {
+          this.src = '/static/sprites/' + this.dataset.pid + '.png';
+        } else {
+          this.onerror = null;
+        }
+      "
+      alt="{{ data.display_name }}"
+    >
+    <div class="flex gap-2">
+      <button class="btn btn-ghost" onclick="toggleShiny()" id="shiny-btn">✨ Shiny</button>
+    </div>
+  </div>
+  <div class="detail-info">
+    <div class="detail-title">
+      <h1>{{ data.display_name }}</h1>
+      <span class="dex-num">#{{ '%03d'|format(data.dex) }}</span>
+    </div>
+    <div class="detail-types">
+      {% for t in data.types %}
+        <span class="type-badge {{ t }}">{{ t }}</span>
+      {% endfor %}
+    </div>
+
+    {% if data.forms and data.forms|length > 1 %}
+    <div class="detail-forms" style="margin-top: 12px; margin-bottom: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+      <span style="font-size: 13px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Form:</span>
+      {% for f in data.forms %}
+        <a href="/pokemon/{{ f.name }}" class="{% if f.name == data.name %}type-badge normal{% else %}type-badge{% endif %}" style="text-decoration:none; opacity: {% if f.name == data.name %}1{% else %}0.6{% endif %}; font-size: 11px;">
+          {{ f.name|replace(data.species.name|lower, '')|replace('-', ' ')|title|trim or 'Base Form' }}
+        </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="detail-meta">
+      {% if data.species.genus %}<span>{{ data.species.genus }}</span>{% endif %}
+      {% if data.species.generation_name %}
+        {% set gen_parts = data.species.generation_name.split('-') %}
+        <span>Generation {{ gen_parts[1]|upper if gen_parts|length > 1 else data.species.generation_name|title }}</span>
+      {% endif %}
+    </div>
+    {% if data.species.flavor_text %}
+      <p class="detail-flavor">{{ data.species.flavor_text }}</p>
+    {% endif %}
+
+    <!-- Info Grid -->
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="label">Height</div>
+        <div class="value">{{ '%.1f'|format(data.height / 10.0) }} m</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Weight</div>
+        <div class="value">{{ '%.1f'|format(data.weight / 10.0) }} kg</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Capture Rate</div>
+        <div class="value">{{ data.species.capture_rate or '—' }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Base Happiness</div>
+        <div class="value">{{ data.species.base_happiness or '—' }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Growth Rate</div>
+        <div class="value" style="text-transform:capitalize">{{ (data.species.growth_rate or '—')|replace('-',' ') }}</div>
+      </div>
+      <div class="info-item">
+        <div class="label">Egg Groups</div>
+        <div class="value" style="text-transform:capitalize">{{ data.egg_groups|join(', ')|replace('-',' ') or '—' }}</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-box" style="margin-top: 24px;">
+      <div class="stat-box-title">Base Stats</div>
+      
+      {% set stat_classes = {
+        'hp': 'hp', 'attack': 'attack', 'defense': 'defense',
+        'special-attack': 'sp-atk', 'special-defense': 'sp-def', 'speed': 'speed'
+      } %}
+      {% set stat_labels = {
+        'hp': 'HP', 'attack': 'Attack', 'defense': 'Defense',
+        'special-attack': 'Special Attack', 'special-defense': 'Special Defense', 'speed': 'Speed'
+      } %}
+      {% for s in data.stats %}
+        <div class="stat-row">
+          <span class="stat-name">{{ stat_labels.get(s.stat_name, s.stat_name) }}</span>
+          <div class="stat-bar-outer">
+            <div class="stat-bar-inner {{ stat_classes.get(s.stat_name, '') }}" style="width: {{ s.percent }}%"></div>
+          </div>
+          <span class="stat-value">{{ s.base_stat }}</span>
+        </div>
+      {% endfor %}
+      
+      <div class="stat-pills">
+        <span>Total: {{ data.total_bst }}</span>
+        <span class="stat-pill-dot">•</span>
+        <span>Catch rate {{ data.species.capture_rate if data.species and data.species.capture_rate is not none else '—' }}</span>
+        <span class="stat-pill-dot">•</span>
+        <span>Happiness {{ data.species.base_happiness if data.species and data.species.base_happiness is not none else '—' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs Section -->
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tab-moves">Moves</button>
+    <button class="tab-btn" data-tab="tab-matchups">Matchups</button>
+    <button class="tab-btn" data-tab="tab-evolution">Evolution</button>
+    <button class="tab-btn" data-tab="tab-abilities">Abilities</button>
+  </div>
+
+  <!-- MOVES TAB -->
+  <div class="tab-panel active" id="tab-moves">
+    <div class="move-filters">
+      <label>Game:</label>
+      <select id="game-selector">
+        {% for g in data.available_games %}
+          <option value="{{ g.key }}" {% if g.key == data.default_game %}selected{% endif %}>{{ g.name }}</option>
+        {% endfor %}
+      </select>
+      <label>Method:</label>
+      <select id="method-selector">
+        <option value="level-up">Level Up</option>
+        <option value="machine">TM / HM</option>
+        <option value="egg">Egg Moves</option>
+        <option value="tutor">Tutor</option>
+      </select>
+    </div>
+    <div class="move-table-container" id="move-table-area">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+  <!-- MATCHUPS TAB -->
+  <div class="tab-panel" id="tab-matchups">
+    {% if data.matchups.weak %}
+      <div class="matchup-section">
+        <div class="matchup-title">⚠️ Weak To (×2 or more)</div>
+        <div class="matchup-list">
+          {% for m in data.matchups.weak %}
+            <div class="matchup-chip">
+              <span class="type-badge {{ m.type }}">{{ m.type }}</span>
+              <span class="mult">{{ m.label }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    {% if data.matchups.resist %}
+      <div class="matchup-section">
+        <div class="matchup-title">🛡️ Resists (×0.5 or less)</div>
+        <div class="matchup-list">
+          {% for m in data.matchups.resist %}
+            <div class="matchup-chip">
+              <span class="type-badge {{ m.type }}">{{ m.type }}</span>
+              <span class="mult">{{ m.label }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    {% if data.matchups.immune %}
+      <div class="matchup-section">
+        <div class="matchup-title">🚫 Immune To</div>
+        <div class="matchup-list">
+          {% for m in data.matchups.immune %}
+            <div class="matchup-chip">
+              <span class="type-badge {{ m.type }}">{{ m.type }}</span>
+              <span class="mult">{{ m.label }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- EVOLUTION TAB -->
+  <div class="tab-panel" id="tab-evolution">
+    {% if data.evolution_tree %}
+      <div class="evo-chain">
+        {% macro render_tree(node) %}
+          <div class="evo-branch">
+            <a href="/pokemon/{{ node.species }}"
+               class="evo-node {% if node.species == data.name %}evo-current{% endif %}">
+              <img src="/static/sprites/{{ node.species }}.png"
+                   onerror="this.src='/static/sprites/official-artwork/{{ node.species }}.png'; this.onerror=null;"
+                   alt="{{ node.species }}">
+              <span class="evo-name">{{ node.species|replace('-',' ')|title }}</span>
+            </a>
+            
+            {% if node.evolves_to %}
+              <div class="evo-children">
+                {% for child in node.evolves_to %}
+                  <div class="evo-child-path">
+                    <div class="evo-arrow">
+                      <span>→</span>
+                      <span class="evo-condition">
+                        {% set evo = child.details %}
+                        {% if evo.min_level %}Lv. {{ evo.min_level }}
+                        {% elif evo.item %}{{ evo.item|replace('-',' ')|title }}
+                        {% elif evo.min_happiness %}Happiness
+                        {% elif evo.known_move %}{{ evo.known_move|replace('-',' ')|title }}
+                        {% elif evo.trigger == 'trade' %}Trade
+                        {% elif evo.trigger == 'use-item' and evo.item %}{{ evo.item|replace('-',' ')|title }}
+                        {% endif %}
+                        {% if evo.time_of_day %}({{ evo.time_of_day|title }}){% endif %}
+                      </span>
+                    </div>
+                    {{ render_tree(child.node) }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endmacro %}
+        
+        {{ render_tree(data.evolution_tree) }}
+      </div>
+    {% elif data.evo_chain_species|length > 1 %}
+      {# Chain exists but no evolution edges — show linked species #}
+      <div class="evo-chain">
+        {% for sp in data.evo_chain_species %}
+          <a href="/pokemon/{{ sp.name }}"
+             class="evo-node {% if sp.name == data.name %}evo-current{% endif %}">
+            <img src="/static/sprites/{{ sp.name }}.png"
+                 onerror="this.src='/static/sprites/official-artwork/{{ sp.name }}.png'; this.onerror=null;"
+                 alt="{{ sp.name }}">
+            <span class="evo-name">{{ sp.name|replace('-',' ')|title }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-muted" style="text-align:center; padding:40px;">This Pokémon does not evolve.</p>
+    {% endif %}
+  </div>
+
+  <!-- ABILITIES TAB -->
+  <div class="tab-panel" id="tab-abilities">
+    <div class="ability-list">
+      {% for ab in data.abilities %}
+        <div class="ability-item">
+          <span class="ability-name">{{ ab.ability_name }}</span>
+          {% if ab.is_hidden %}<span class="ability-hidden">(Hidden)</span>{% endif %}
+          {% if ab.flavor_text %}
+            <p class="ability-desc">{{ ab.flavor_text }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tabs.js') }}"></script>
+<script>
+  // ── AJAX Move Table ──
+  const pokemonName = {{ data.name|tojson }};
+
+  function loadMoves() {
+    const vg     = document.getElementById('game-selector').value;
+    const method = document.getElementById('method-selector').value;
+    const area   = document.getElementById('move-table-area');
+    area.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+    fetch(`/api/moves/${pokemonName}?vg=${vg}&method=${method}`)
+      .then(r => r.json())
+      .then(moves => {
+        if (!moves || moves.length === 0) {
+          area.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px;">No moves found for this game / method.</p>';
+          return;
+        }
+        const rows = moves.map(m => {
+          const name = m.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+          const catCls = (m.damage_class || 'status').toLowerCase();
+          const effect = (m.short_effect || '')
+            .replace('$effect_chance', m.effect_chance || '')
+            .substring(0, 120);
+          return `<tr>
+            <td>${m.level_learned || '—'}</td>
+            <td class="move-name">${name}</td>
+            <td><span class="type-badge ${m.type_name}">${m.type_name || '—'}</span></td>
+            <td><span class="cat-badge ${catCls}">${m.damage_class || '—'}</span></td>
+            <td>${m.power || '—'}</td>
+            <td>${m.accuracy || '—'}</td>
+            <td>${m.pp || '—'}</td>
+            <td class="move-effect">${effect}</td>
+          </tr>`;
+        }).join('');
+
+        area.innerHTML = `
+          <table class="move-table">
+            <thead>
+              <tr>
+                <th>Lv</th><th>Move</th><th>Type</th><th>Cat</th>
+                <th>Pow</th><th>Acc</th><th>PP</th><th>Effect</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        `;
+      })
+      .catch(err => {
+        area.innerHTML = '<p class="text-muted" style="text-align:center; padding:20px;">Failed to load moves.</p>';
+      });
+  }
+
+  document.getElementById('game-selector').addEventListener('change', loadMoves);
+  document.getElementById('method-selector').addEventListener('change', loadMoves);
+  // Initial load
+  loadMoves();
+
+  // ── Shiny Toggle ──
+  let isShiny = false;
+  function toggleShiny() {
+    isShiny = !isShiny;
+    const img = document.getElementById('main-sprite');
+    const btn = document.getElementById('shiny-btn');
+    if (isShiny) {
+      img.src = `/static/sprites/official-artwork/shiny/${img.dataset.pid}.png`;
+      btn.textContent = '⭐ Normal';
+    } else {
+      img.src = `/static/sprites/official-artwork/${img.dataset.pid}.png`;
+      btn.textContent = '✨ Shiny';
+    }
+  }
+</script>
+{% endblock %}

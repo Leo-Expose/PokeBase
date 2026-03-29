@@ -1,16 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="default" data-mode="light">
 <head>
-  <meta charset="UTF-8" />
-  <title>{% block title %}PokéBase{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PokeBase{% endblock %}</title>
+  <meta name="description" content="{% block description %}PokeBase — Your self-hosted Pokédex with all Pokémon through Gen 9{% endblock %}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Exo+2:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <!-- Apply theme BEFORE body renders to prevent flash -->
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+  {% block head %}{% endblock %}
 </head>
 <body>
-  <div class="page-shell">
-    {% block content %}{% endblock %}
+  <nav class="navbar">
+    <a href="/" class="nav-logo">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="PokeBase" class="logo-img"> PokeBase
+    </a>
+    <div class="nav-search">
+      <input type="text" id="nav-search-input" placeholder="Search Pokémon..." autocomplete="off">
+      <ul id="search-dropdown" class="search-dropdown hidden"></ul>
+    </div>
+    <div class="nav-actions">
+      <a href="/browse" class="nav-link">Browse</a>
+      <a href="/type-calc" class="nav-link">Type Calc</a>
+      <a href="/compare" class="nav-link">Compare</a>
+      <a href="/random" class="nav-link">Random</a>
+      <button class="btn-icon" id="settings-toggle" onclick="toggleSettings()" title="Settings">⚙️</button>
+    </div>
+  </nav>
+
+  <!-- Settings Panel -->
+  <div class="settings-overlay hidden" id="settings-overlay" onclick="closeSettings()"></div>
+  <div class="settings-panel hidden" id="settings-panel">
+    <div class="settings-header">
+      <h3>Settings</h3>
+      <button class="btn-icon" onclick="toggleSettings()">✕</button>
+    </div>
+
+    <div class="settings-section">
+      <label class="settings-label">Theme</label>
+      <div class="theme-picker">
+        <button class="theme-option" data-theme="default" onclick="selectTheme('default')">
+          <div class="theme-dot" style="background: linear-gradient(135deg, #dc2626, #b91c1c)"></div>
+          <span>Default</span>
+        </button>
+        <button class="theme-option" data-theme="gen4" onclick="selectTheme('gen4')">
+          <div class="theme-dot" style="background: linear-gradient(135deg, #3050b8, #5a90e8)"></div>
+          <span>Gen 4</span>
+        </button>
+        <button class="theme-option" data-theme="future" onclick="selectTheme('future')">
+          <div class="theme-dot" style="background: linear-gradient(135deg, #7c4dff, #b388ff)"></div>
+          <span>Future</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <label class="settings-label">Mode</label>
+      <div class="mode-picker">
+        <button class="mode-option" data-mode-val="light" onclick="selectMode('light')">
+          <span class="mode-icon">☀️</span>
+          <span>Light</span>
+        </button>
+        <button class="mode-option" data-mode-val="dark" onclick="selectMode('dark')">
+          <span class="mode-icon">🌙</span>
+          <span>Dark</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-info">
+        <span class="text-muted" style="font-size: 0.75rem;">PokeBase v2.0 · Self-hosted Pokédex</span>
+      </div>
+    </div>
   </div>
 
-  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+  <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+  <script>
+    // Settings panel
+    function toggleSettings() {
+      const panel = document.getElementById('settings-panel');
+      const overlay = document.getElementById('settings-overlay');
+      const isOpen = !panel.classList.contains('hidden');
+      if (isOpen) {
+        closeSettings();
+      } else {
+        panel.classList.remove('hidden');
+        overlay.classList.remove('hidden');
+        updateSettingsUI();
+      }
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-panel').classList.add('hidden');
+      document.getElementById('settings-overlay').classList.add('hidden');
+    }
+
+    // ESC key closes settings
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const panel = document.getElementById('settings-panel');
+        if (panel && !panel.classList.contains('hidden')) {
+          e.preventDefault();
+          closeSettings();
+        }
+      }
+    });
+
+    function selectTheme(theme) {
+      const mode = localStorage.getItem('pb_mode') || 'light';
+      applyTheme(theme, mode);
+      updateSettingsUI();
+    }
+
+    function selectMode(mode) {
+      const theme = localStorage.getItem('pb_theme') || 'default';
+      applyTheme(theme, mode);
+      updateSettingsUI();
+    }
+
+    function updateSettingsUI() {
+      const theme = localStorage.getItem('pb_theme') || 'default';
+      const mode  = localStorage.getItem('pb_mode') || 'light';
+
+      document.querySelectorAll('.theme-option').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.theme === theme);
+      });
+      document.querySelectorAll('.mode-option').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.modeVal === mode);
+      });
+    }
+  </script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>
