@@ -6,6 +6,10 @@
       "config": {
         "excludeFiles": "static/sprites/**"
       }
+    },
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
