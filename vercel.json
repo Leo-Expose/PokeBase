@@ -1,23 +1,17 @@
 {
-  "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python"
-    }
-  ],
   "functions": {
-    "app.py": {
+    "api/app.py": {
       "excludeFiles": "static/sprites/**"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "source": "/static/(.*)",
+      "destination": "/static/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/app.py"
+      "source": "/(.*)",
+      "destination": "/api/app.py"
     }
   ]
 }
