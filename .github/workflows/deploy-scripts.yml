@@ -1,11 +1,9 @@
-name: Deploy scripts to S3
+name: Deploy source to S3
 
 on:
   push:
     branches:
       - master
-    paths:
-      - "scripts/**"
 
 permissions:
   id-token: write
@@ -24,5 +22,11 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Sync scripts to S3
-        run: aws s3 sync scripts/ s3://${{ secrets.DEPLOY_BUCKET }}/scripts/ --delete
+      - name: Create source archive
+        run: git archive --format=zip -o pokebase-latest.zip HEAD
+
+      - name: Upload to S3
+        run: aws s3 cp pokebase-latest.zip s3://${{ secrets.DEPLOY_BUCKET }}/pokebase-latest.zip
+
+      - name: Trigger CodePipeline
+        run: aws codepipeline start-pipeline-execution --name pokebase-pipeline
