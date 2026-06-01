@@ -47,6 +47,8 @@ elif [ -n "$S3_BUCKET" ]; then
     else
         log "No database in S3, fetching from PokeAPI (slow, first run)..."
         python fetch_data.py
+        log "Caching database to S3 for future runs..."
+        aws s3 cp "$DB_PATH" "s3://$S3_BUCKET/data/pokebase.db" --quiet || true
     fi
 else
     log "Fetching Pokémon data from PokeAPI (slow, first run)..."
@@ -68,6 +70,8 @@ elif [ -n "$S3_BUCKET" ]; then
     else
         log "No sprites in S3, downloading from PokeAPI (slow, first run)..."
         python fetch_sprites.py
+        log "Caching sprites to S3 for future runs..."
+        aws s3 sync "static/sprites/" "s3://$S3_BUCKET/static/sprites/" --quiet || true
     fi
 else
     log "Downloading Pokémon sprites from PokeAPI (slow, first run)..."
