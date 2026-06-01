@@ -1,0 +1,7 @@
+exclude_dirs:
+  - venv
+  - __pycache__
+  - .git
+  - .codegraph
+  - .opencode
+  - .github
