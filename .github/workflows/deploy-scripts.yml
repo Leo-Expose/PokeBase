@@ -27,6 +27,3 @@ jobs:
 
       - name: Upload to S3
         run: aws s3 cp pokebase-latest.zip s3://${{ secrets.DEPLOY_BUCKET }}/pokebase-latest.zip
-
-      - name: Trigger CodePipeline
-        run: aws codepipeline start-pipeline-execution --name pokebase-pipeline
