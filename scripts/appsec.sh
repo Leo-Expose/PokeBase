@@ -32,7 +32,7 @@ fi
 
 # ── Code scan ─────────────────────────────────────────────────────────────────
 log "Running bandit on Python files..."
-    if bandit -r . --quiet --exclude "venv/,__pycache__/,.git/" 2>/dev/null; then
+    if bandit -r . --quiet --exclude "venv,__pycache__,.git,.codegraph,.opencode" 2>/dev/null; then
     log "bandit: no issues found"
 else
     err "bandit: security issues detected"
