@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - master
-
+    paths:
+      - "scripts/**"
 
 permissions:
   id-token: write
@@ -25,6 +26,3 @@ jobs:
 
       - name: Sync scripts to S3
         run: aws s3 sync scripts/ s3://${{ secrets.DEPLOY_BUCKET }}/scripts/ --delete
-
-      - name: Trigger CodePipeline
-        run: aws codepipeline start-pipeline-execution --name pokebase-pipeline
