@@ -259,13 +259,13 @@ def browse_pokemon(gen="all", type_="all", page=1, per_page=60) -> dict:
     where_sql = " AND ".join(where_clauses)
     offset = (page - 1) * per_page
 
-    total = conn.execute(f"""
+    total = conn.execute(f"""  # nosec - B608: where_sql is built from fixed predicates, params are parameterized
         SELECT COUNT(*) FROM pokemon p
         JOIN species s ON s.id=p.species_id
         WHERE {where_sql}
     """, params).fetchone()[0]
 
-    rows = conn.execute(f"""
+    rows = conn.execute(f"""  # nosec - B608: where_sql is fixed predicates, params are parameterized
         SELECT p.id, p.name, p.species_id,
                GROUP_CONCAT(pt.type_name) as types
         FROM pokemon p
