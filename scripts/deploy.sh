@@ -50,7 +50,8 @@ rsync -avz --delete \
     --exclude '.codegraph' \
     --exclude '.opencode' \
     --exclude '.github' \
-    --exclude '*.db' \
+    --exclude 'data/' \
+    --exclude 'static/sprites/' \
     --exclude 'pokebase-latest.zip' \
     ./ "$EC2_USER@$EC2_HOST:$EC2_PATH/"
 
