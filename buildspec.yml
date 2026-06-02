@@ -10,9 +10,10 @@ phases:
     runtime-versions:
       python: 3.11
     commands:
-      - chmod +x scripts/install.sh scripts/appsec.sh scripts/deploy.sh
-      - ./scripts/install.sh
+      - chmod +x scripts/appsec.sh scripts/deploy.sh
+      - python3 -m venv venv
+      - source venv/bin/activate && pip install --quiet -r requirements.txt
   post_build:
     commands:
-      - ./scripts/appsec.sh
+      - source venv/bin/activate && ./scripts/appsec.sh
       - ./scripts/deploy.sh
