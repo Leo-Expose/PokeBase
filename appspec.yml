@@ -9,12 +9,12 @@ permissions:
     pattern: "**"
     owner: ubuntu
     group: ubuntu
-    mode: 0644
+    mode: "0644"
   - object: /home/ubuntu/PokeBase/scripts
     pattern: "*.sh"
     owner: ubuntu
     group: ubuntu
-    mode: 0755
+    mode: "0755"
 hooks:
   AfterInstall:
     - location: scripts/codedeploy-after-install.sh
