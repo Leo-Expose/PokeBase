@@ -4,12 +4,11 @@ set -euo pipefail
 cd /home/ubuntu/PokeBase
 
 chmod -R +x scripts/*.sh
-sudo chown -R ubuntu:ubuntu /home/ubuntu/PokeBase 2>/dev/null || true
+chown -R ubuntu:ubuntu /home/ubuntu/PokeBase
 
 if [ ! -d venv ]; then
-    python3 -m venv venv
+    sudo -u ubuntu python3 -m venv venv
 fi
-source venv/bin/activate
-pip install --quiet -r requirements.txt
+sudo -u ubuntu bash -c "source venv/bin/activate && pip install --quiet -r requirements.txt"
 
 mkdir -p data static/sprites

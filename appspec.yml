@@ -8,7 +8,6 @@ hooks:
   AfterInstall:
     - location: scripts/codedeploy-after-install.sh
       timeout: 300
-      runas: ubuntu
   ApplicationStart:
     - location: scripts/codedeploy-application-start.sh
       timeout: 60
