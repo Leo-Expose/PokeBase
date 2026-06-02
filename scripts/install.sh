@@ -71,7 +71,7 @@ elif [ -n "$S3_BUCKET" ]; then
         log "No sprites in S3, downloading from PokeAPI (slow, first run)..."
         python fetch_sprites.py
         log "Caching sprites to S3 for future runs..."
-        aws s3 sync "static/sprites/" "s3://$S3_BUCKET/static/sprites/" --quiet || true
+        aws s3 sync "static/sprites/" "s3://$S3_BUCKET/static/sprites/" --quiet || log "WARNING: Failed to cache sprites to S3"
     fi
 else
     log "Downloading Pokémon sprites from PokeAPI (slow, first run)..."
