@@ -3,6 +3,9 @@ set -euo pipefail
 
 cd /home/ubuntu/PokeBase
 
+chmod -R +x scripts/*.sh
+sudo chown -R ubuntu:ubuntu /home/ubuntu/PokeBase 2>/dev/null || true
+
 if [ ! -d venv ]; then
     python3 -m venv venv
 fi
