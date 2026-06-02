@@ -25,12 +25,12 @@ if [ -z "$EC2_HOST" ] || [ "$EC2_HOST" = "None" ]; then
 fi
 log "Public IP: $EC2_HOST | AZ: $EC2_AZ"
 
-DEPLOY_KEY=$(mktemp)
-DEPLOY_KEY_PUB="${DEPLOY_KEY}.pub"
+DEPLOY_DIR=$(mktemp -d)
+DEPLOY_KEY="$DEPLOY_DIR/ec2_key"
 ssh-keygen -t ed25519 -f "$DEPLOY_KEY" -N "" -q
 
 cleanup() {
-    rm -f "$DEPLOY_KEY" "$DEPLOY_KEY_PUB"
+    rm -rf "$DEPLOY_DIR"
 }
 trap cleanup EXIT
 
@@ -39,7 +39,7 @@ aws ec2-instance-connect send-ssh-public-key \
     --instance-id "$EC2_INSTANCE" \
     --availability-zone "$EC2_AZ" \
     --instance-os-user "$EC2_USER" \
-    --ssh-public-key "file://$DEPLOY_KEY_PUB"
+    --ssh-public-key "file://${DEPLOY_KEY}.pub"
 
 log "Syncing files to $EC2_USER@$EC2_HOST:$EC2_PATH..."
 rsync -avz --delete \
