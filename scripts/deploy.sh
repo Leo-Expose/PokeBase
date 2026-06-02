@@ -8,7 +8,7 @@ log() { printf "[deploy] %s\n" "$*"; }
 
 EC2_INSTANCE="${EC2_INSTANCE:-}"
 EC2_USER="${EC2_USER:-ubuntu}"
-EC2_PATH="${EC2_PATH:-/home/ubuntu/pokebase}"
+EC2_PATH="${EC2_PATH:-/home/ubuntu/PokeBase}"
 
 if [ -z "$EC2_INSTANCE" ]; then
     log "EC2_INSTANCE must be set"
@@ -56,11 +56,9 @@ rsync -avz --delete \
 
 log "Installing dependencies on EC2..."
 ssh -i "$DEPLOY_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-    "$EC2_USER@$EC2_HOST" bash <<'REMOTE'
+    "$EC2_USER@$EC2_HOST" bash -s "$EC2_PATH" <<'REMOTE'
 set -euo pipefail
-cd "$(dirname "$0")"
-
-cd /home/ubuntu/pokebase
+cd "$1"
 
 if [ ! -d venv ]; then
     python3 -m venv venv
@@ -73,21 +71,11 @@ REMOTE
 
 log "Restarting app..."
 ssh -i "$DEPLOY_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
-    "$EC2_USER@$EC2_HOST" bash <<'REMOTE'
-set -euo pipefail
-
-SERVICE="pokebase"
-SERVICE_FILE="/etc/systemd/system/$SERVICE.service"
-
-if [ -f "$SERVICE_FILE" ]; then
-    sudo systemctl daemon-reload
-    sudo systemctl restart "$SERVICE"
-    sudo systemctl status "$SERVICE" --no-pager | head -5
-    log "Service $SERVICE restarted"
-else
-    log "No systemd service found at $SERVICE_FILE"
-    log "To run manually: source /home/ubuntu/pokebase/venv/bin/activate && python /home/ubuntu/pokebase/app.py"
-fi
-REMOTE
+    "$EC2_USER@$EC2_HOST" sudo systemctl daemon-reload
+ssh -i "$DEPLOY_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+    "$EC2_USER@$EC2_HOST" sudo systemctl restart pokebase
+ssh -i "$DEPLOY_KEY" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+    "$EC2_USER@$EC2_HOST" sudo systemctl status pokebase --no-pager | head -5
+log "App restarted"
 
 log "Deploy complete!"
