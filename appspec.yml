@@ -1,0 +1,26 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/PokeBase
+file_exists_behavior: OVERWRITE
+permissions:
+  - object: /home/ubuntu/PokeBase
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+    mode: 0644
+  - object: /home/ubuntu/PokeBase/scripts
+    pattern: "*.sh"
+    owner: ubuntu
+    group: ubuntu
+    mode: 0755
+hooks:
+  AfterInstall:
+    - location: scripts/codedeploy-after-install.sh
+      timeout: 300
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/codedeploy-application-start.sh
+      timeout: 60
+      runas: ubuntu
