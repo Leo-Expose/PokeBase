@@ -62,10 +62,9 @@ mkdir -p static/sprites
 if [ -d "static/sprites" ] && [ "$(ls -A static/sprites 2>/dev/null)" ]; then
     log "Sprites already downloaded"
 elif [ -n "$S3_BUCKET" ]; then
-    log "Checking S3 for sprites..."
-    if aws s3 ls "s3://$S3_BUCKET/static/sprites/" 2>/dev/null | grep -q .; then
-        log "Downloading sprites from S3..."
-        aws s3 sync "s3://$S3_BUCKET/static/sprites/" "static/sprites/" --quiet
+    log "Trying to download sprites from S3..."
+    aws s3 sync "s3://$S3_BUCKET/static/sprites/" "static/sprites/" --quiet
+    if [ -d "static/sprites" ] && [ "$(ls -A static/sprites 2>/dev/null)" ]; then
         log "Sprites downloaded from S3"
     else
         log "No sprites in S3, downloading from PokeAPI (slow, first run)..."

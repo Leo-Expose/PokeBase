@@ -1,7 +1,9 @@
 exclude_dirs:
-  - venv
-  - __pycache__
-  - .git
-  - .codegraph
-  - .opencode
-  - .github
+  - /venv/
+  - /__pycache__/
+  - /.git/
+  - /.codegraph/
+  - /.opencode/
+  - /.github/
+  - /_distutils_hack/
+  - /site-packages/
