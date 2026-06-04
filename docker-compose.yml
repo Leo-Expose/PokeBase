@@ -1,0 +1,7 @@
+services:
+  pokebase:
+    build: .
+    container_name: pokebase
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
