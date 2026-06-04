@@ -2,13 +2,18 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /home/ubuntu/PokeBase
+    destination: /home/admin/PokeBase
 file_exists_behavior: OVERWRITE
 hooks:
+  BeforeInstall:
+    - location: scripts/codedeploy-before-install.sh
+      timeout: 30
+      runas: root
   AfterInstall:
     - location: scripts/codedeploy-after-install.sh
       timeout: 300
+      runas: root
   ApplicationStart:
     - location: scripts/codedeploy-application-start.sh
-      timeout: 60
-      runas: ubuntu
+      timeout: 120
+      runas: root
