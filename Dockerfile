@@ -22,6 +22,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
+ENV PYTHONUNBUFFERED=1
 
 EXPOSE 5000
 

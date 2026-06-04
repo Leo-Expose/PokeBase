@@ -50,7 +50,8 @@ def download_with_progress(url: str, path: str) -> bool:
     try:
         with open(path, "wb") as f:
             with tqdm(
-                total=total, unit="B", unit_scale=True, desc="Downloading", leave=False
+                total=total, unit="B", unit_scale=True, desc="Downloading",
+                mininterval=1, file=sys.stdout, dynamic_ncols=True,
             ) as pbar:
                 while chunk := resp.read(CHUNK_SIZE):
                     f.write(chunk)
@@ -69,6 +70,7 @@ def acquire_tarball() -> str | None:
         print("Found local data bundle.")
         return local_bundle
 
+    print("Fetching latest release info from GitHub...", flush=True)
     asset_url = latest_asset_url()
     if not asset_url:
         return None
@@ -80,6 +82,9 @@ def acquire_tarball() -> str | None:
 
 
 def main() -> None:
+    print("PokeBase data check...", flush=True)
+    sys.stdout.flush()
+
     if os.path.exists(DB_PATH) and os.path.getsize(DB_PATH) > 0:
         print("Data already exists, skipping download.")
         return
