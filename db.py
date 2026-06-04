@@ -259,23 +259,15 @@ def browse_pokemon(gen="all", type_="all", page=1, per_page=60) -> dict:
     where_sql = " AND ".join(where_clauses)
     offset = (page - 1) * per_page
 
-    total = conn.execute(f"""
-        SELECT COUNT(*) FROM pokemon p
-        JOIN species s ON s.id=p.species_id
-        WHERE {where_sql}
-    """, params).fetchone()[0]
+    count_query = "SELECT COUNT(*) FROM pokemon p JOIN species s ON s.id=p.species_id WHERE " + where_sql
+    total = conn.execute(count_query, params).fetchone()[0]
 
-    rows = conn.execute(f"""
-        SELECT p.id, p.name, p.species_id,
-               GROUP_CONCAT(pt.type_name) as types
-        FROM pokemon p
-        JOIN species s ON s.id=p.species_id
-        LEFT JOIN pokemon_types pt ON pt.pokemon_id=p.id
-        WHERE {where_sql}
-        GROUP BY p.id
-        ORDER BY p.species_id
-        LIMIT ? OFFSET ?
-    """, params + [per_page, offset]).fetchall()
+    browse_query = "SELECT p.id, p.name, p.species_id, GROUP_CONCAT(pt.type_name) as types" \
+                   " FROM pokemon p JOIN species s ON s.id=p.species_id" \
+                   " LEFT JOIN pokemon_types pt ON pt.pokemon_id=p.id" \
+                   " WHERE " + where_sql + \
+                   " GROUP BY p.id ORDER BY p.species_id LIMIT ? OFFSET ?"
+    rows = conn.execute(browse_query, params + [per_page, offset]).fetchall()
 
     conn.close()
     return {

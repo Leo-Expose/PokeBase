@@ -1,2 +1,0 @@
-Extract all sprites from Sprites.zip into this folder. Find it in the Github releases
-

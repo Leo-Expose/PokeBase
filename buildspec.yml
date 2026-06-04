@@ -1,0 +1,33 @@
+version: 0.2
+
+env:
+  variables:
+    S3_BUCKET: "testing-pipeline-45876"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - chmod +x scripts/appsec.sh
+      - python3 -m venv venv
+      - source venv/bin/activate && pip install --quiet -r requirements.txt
+  post_build:
+    commands:
+      - source venv/bin/activate && ./scripts/appsec.sh
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no
+  exclude-paths:
+    - venv/**/*
+    - __pycache__/**/*
+    - .git/**/*
+    - .codegraph/**/*
+    - .opencode/**/*
+    - .github/**/*
+    - data/**/*
+    - static/sprites/**/*
+    - pokebase-latest.zip
+    - scripts/deploy.sh
