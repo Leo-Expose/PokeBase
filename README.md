@@ -1,39 +1,45 @@
-
 # PokeBase
 
-A self-hosted Pokédex application, up to date through Gen 7.  
-The database was created using CSVs from [Veekun](https://github.com/veekun/pokedex).
+A self-hosted Pokédex application covering Pokémon through Gen 9.  
+Data fetched from [PokeAPI](https://pokeapi.co/) and sprites from [PokeAPI/sprites](https://github.com/PokeAPI/sprites).
 
-## How to Run
+## Quick Start (Docker)
 
-1. **Clone the repository**
-> Note: The `master` branch does not contain the database or sprites to keep the repository lightweight for cloning. 
-> To see a working live version with all assets deployed on Vercel, check out the `dev` branch.
+```bash
+docker compose up --build
+```
 
-````bash
-git clone https://github.com/Leo-Expose/PokeBase.git
-cd PokeBase
-````
+Visit [http://localhost:5000](http://localhost:5000).
 
-2. **Install Python requirements**
+On first start, the container downloads the Pokémon database and sprites from the
+[latest GitHub Release](https://github.com/Leo-Expose/PokeBase/releases) and
+extracts them into named volumes. Subsequent starts are instant.
+
+## Running Without Docker
 
 ```bash
 pip install -r requirements.txt
-```
-
-3. **Download data**
-
-* Download `Database.zip` and `Sprites.zip` from the releases.
-* Extract them.
-* Move the `pokedex.sqlite` file to the `/data` folder.
-* Move all sprite images to `/static/sprites/`.
-
-4. **Run the app**
-
-```bash
+python fetch_data.py    # pulls from PokeAPI (~5-10 min)
+python fetch_sprites.py # downloads sprites (~2-5 min)
 python app.py
 ```
 
-5. **Open in browser**
+## Refreshing the Data
 
-Visit [http://localhost:5000](http://localhost:5000) to use the app.
+When new games or Pokémon are released, update the data and publish a new release:
+
+```bash
+git checkout dev
+python fetch_data.py && python fetch_sprites.py
+bash scripts/prepare-release.sh            # creates pokebase-data.tar.gz
+gh release upload v1.0.0 pokebase-data.tar.gz --clobber
+```
+
+Then rebuild containers — they pull the latest release on first start.
+
+## Branches
+
+| Branch | Contains data? | Use |
+|--------|---------------|-----|
+| `master` | No | Lightweight clone, Docker-friendly |
+| `dev` | Yes (DB + sprites) | Development, data refreshes |
