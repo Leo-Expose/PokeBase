@@ -45,12 +45,14 @@ def latest_asset_url() -> str | None:
 
 
 def download_with_progress(url: str, path: str) -> bool:
-    print(f"  Downloading from GitHub...", flush=True)
+    print(f"  Connecting...", flush=True)
     try:
         resp = urllib.request.urlopen(url, timeout=120)
     except Exception as e:
         print(f"  Connection failed: {e}", file=sys.stderr)
         return False
+
+    print(f"  Downloading from GitHub...", flush=True)
 
     total = int(resp.headers.get("Content-Length", 0))
     try:
