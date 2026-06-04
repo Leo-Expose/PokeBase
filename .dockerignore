@@ -13,3 +13,4 @@ buildspec.yml
 bandit.yaml
 vercel.json
 test.txt
+*.tar.gz

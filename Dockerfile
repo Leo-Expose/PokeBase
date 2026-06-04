@@ -14,15 +14,16 @@ COPY static/css ./static/css/
 COPY static/js ./static/js/
 COPY static/logo.png ./static/logo.png
 
-COPY data/ ./data/
-COPY static/sprites/ ./static/sprites/
-
+COPY scripts/download-data.py ./scripts/download-data.py
 COPY fetch_data.py fetch_sprites.py ./
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+
 EXPOSE 5000
 
 ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["python", "app.py"]
+CMD ["flask", "run"]
