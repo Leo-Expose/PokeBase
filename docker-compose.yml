@@ -1,5 +1,6 @@
 services:
   pokebase:
+    image: pokebase
     build: .
     container_name: pokebase
     ports:
