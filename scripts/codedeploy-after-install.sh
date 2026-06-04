@@ -19,9 +19,9 @@ if ! command -v docker &>/dev/null; then
     apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-compose-plugin
 fi
 
-# Login to ECR
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-REPOSITORY_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/pokebase"
-aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$REPOSITORY_URI"
+# Login to ECR (hardcoded since AWS CLI may not have config)
+ACCOUNT_ID="970006065759"
+REPOSITORY_URI="${ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/pokebase"
+aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin "$REPOSITORY_URI" || true
 
 mkdir -p data static/sprites
