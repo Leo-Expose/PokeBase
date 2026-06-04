@@ -5,10 +5,14 @@ import sys
 import tarfile
 import urllib.request
 
+from tqdm import tqdm
+
 REPO = "Leo-Expose/PokeBase"
 TARGET = "/app"
 DATA_DIR = os.path.join(TARGET, "data")
 DB_PATH = os.path.join(DATA_DIR, "pokebase.db")
+CHUNK_SIZE = 8192
+PROGRESS_INTERVAL = 10 * 1024 * 1024  # report every 10 MB
 
 
 def latest_asset_url() -> str | None:
@@ -33,6 +37,32 @@ def latest_asset_url() -> str | None:
     return None
 
 
+def download_with_progress(url: str, path: str) -> bool:
+    try:
+        resp = urllib.request.urlopen(url, timeout=120)
+    except Exception as e:
+        print(f"Connection failed: {e}", file=sys.stderr)
+        return False
+
+    total = int(resp.headers.get("Content-Length", 0))
+    downloaded = 0
+    last_report = 0
+    try:
+        with open(path, "wb") as f:
+            with tqdm(
+                total=total, unit="B", unit_scale=True, desc="Downloading", leave=False
+            ) as pbar:
+                while chunk := resp.read(CHUNK_SIZE):
+                    f.write(chunk)
+                    chunk_len = len(chunk)
+                    downloaded += chunk_len
+                    pbar.update(chunk_len)
+    except Exception as e:
+        print(f"Download failed: {e}", file=sys.stderr)
+        return False
+    return True
+
+
 def acquire_tarball() -> str | None:
     local_bundle = "/app/pokebase-data.tar.gz"
     if os.path.exists(local_bundle):
@@ -44,11 +74,7 @@ def acquire_tarball() -> str | None:
         return None
 
     tarball = "/tmp/pokebase-data.tar.gz"
-    print(f"Downloading {asset_url}...")
-    try:
-        urllib.request.urlretrieve(asset_url, tarball)
-    except Exception as e:
-        print(f"Download failed: {e}", file=sys.stderr)
+    if not download_with_progress(asset_url, tarball):
         return None
     return tarball
 
