@@ -1,0 +1,14 @@
+services:
+  pokebase:
+    build: .
+    container_name: pokebase
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    volumes:
+      - pokebase-data:/app/data
+      - pokebase-sprites:/app/static/sprites
+
+volumes:
+  pokebase-data:
+  pokebase-sprites:

@@ -1,0 +1,16 @@
+__pycache__/
+.venv/
+venv/
+.git/
+.gitattributes
+.gitignore
+.codegraph/
+.opencode/
+openspec/
+*.md
+appspec.yml
+buildspec.yml
+bandit.yaml
+vercel.json
+test.txt
+*.tar.gz
