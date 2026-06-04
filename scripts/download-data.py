@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import tarfile
+import time
 import urllib.request
 
 from tqdm import tqdm
@@ -12,6 +13,9 @@ TARGET = "/app"
 DATA_DIR = os.path.join(TARGET, "data")
 DB_PATH = os.path.join(DATA_DIR, "pokebase.db")
 CHUNK_SIZE = 8192
+CONNECT_TIMEOUT = 15
+DOWNLOAD_TIMEOUT = 120
+MAX_RETRIES = 3
 
 
 def latest_asset_url() -> str | None:
@@ -45,29 +49,44 @@ def latest_asset_url() -> str | None:
 
 
 def download_with_progress(url: str, path: str) -> bool:
-    print(f"  Connecting...", flush=True)
-    try:
-        resp = urllib.request.urlopen(url, timeout=120)
-    except Exception as e:
-        print(f"  Connection failed: {e}", file=sys.stderr)
-        return False
+    for attempt in range(1, MAX_RETRIES + 1):
+        if attempt > 1:
+            print(f"  Retry {attempt}/{MAX_RETRIES} in 3s...", flush=True)
+            time.sleep(3)
 
-    print(f"  Downloading from GitHub...", flush=True)
+        print(f"  Connecting (attempt {attempt}/{MAX_RETRIES}, {CONNECT_TIMEOUT}s timeout)...", flush=True)
+        start = time.time()
+        try:
+            resp = urllib.request.urlopen(url, timeout=CONNECT_TIMEOUT)
+        except Exception as e:
+            elapsed = time.time() - start
+            print(f"  Connection failed after {elapsed:.0f}s: {e}", file=sys.stderr)
+            continue
 
-    total = int(resp.headers.get("Content-Length", 0))
-    try:
-        with open(path, "wb") as f:
-            with tqdm(
-                total=total, unit="B", unit_scale=True, desc="Downloading",
-                mininterval=1, file=sys.stdout, dynamic_ncols=True,
-            ) as pbar:
-                while chunk := resp.read(CHUNK_SIZE):
-                    f.write(chunk)
-                    pbar.update(len(chunk))
-    except Exception as e:
-        print(f"  Download failed: {e}", file=sys.stderr)
-        return False
-    return True
+        remaining = DOWNLOAD_TIMEOUT
+        total = int(resp.headers.get("Content-Length", 0))
+        try:
+            with open(path, "wb") as f:
+                with tqdm(
+                    total=total, unit="B", unit_scale=True, desc="Downloading",
+                    mininterval=1, file=sys.stdout, dynamic_ncols=True,
+                ) as pbar:
+                    while chunk := resp.read(CHUNK_SIZE):
+                        f.write(chunk)
+                        pbar.update(len(chunk))
+        except Exception as e:
+            print(f"  Download failed: {e}", file=sys.stderr)
+            continue
+        return True
+
+    print(
+        "  All connection attempts failed.\n"
+        "  Tip: your network may be blocking GitHub downloads.\n"
+        "  Set POKEBASE_DATA_URL in docker-compose.yml to a direct download URL to bypass.\n"
+        "  Get the URL from: https://github.com/Leo-Expose/PokeBase/releases/latest",
+        file=sys.stderr,
+    )
+    return False
 
 
 def acquire_tarball() -> str | None:
