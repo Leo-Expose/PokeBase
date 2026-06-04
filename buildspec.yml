@@ -3,6 +3,7 @@ version: 0.2
 env:
   variables:
     IMAGE_REPO_NAME: "pokebase"
+    POKEBASE_DATA_URL: ""  # override in CodeBuild project env with your S3 object URL
 
 phases:
   pre_build:

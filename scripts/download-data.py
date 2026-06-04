@@ -81,9 +81,9 @@ def download_with_progress(url: str, path: str) -> bool:
 
     print(
         "  All connection attempts failed.\n"
-        "  Tip: your network may be blocking GitHub downloads.\n"
-        "  Set POKEBASE_DATA_URL in docker-compose.yml to a direct download URL to bypass.\n"
-        "  Get the URL from: https://github.com/Leo-Expose/PokeBase/releases/latest",
+        "  Set POKEBASE_DATA_URL to a direct download URL to bypass:\n"
+        "  - S3: https://<bucket>.s3.<region>.amazonaws.com/pokebase-data.tar.gz\n"
+        "  - GitHub: https://github.com/Leo-Expose/PokeBase/releases/latest",
         file=sys.stderr,
     )
     return False
@@ -97,7 +97,7 @@ def acquire_tarball() -> str | None:
 
     direct_url = os.environ.get("POKEBASE_DATA_URL")
     if direct_url:
-        print(f"Using POKEBASE_DATA_URL: {direct_url}", flush=True)
+        print(f"Using POKEBASE_DATA_URL as data source.", flush=True)
         tarball = "/tmp/pokebase-data.tar.gz"
         if download_with_progress(direct_url, tarball):
             return tarball
@@ -106,10 +106,6 @@ def acquire_tarball() -> str | None:
     print("Fetching latest release info from GitHub...", flush=True)
     asset_url = latest_asset_url()
     if not asset_url:
-        print(
-            "  Tip: Set POKEBASE_DATA_URL to a direct download URL to bypass GitHub API.",
-            file=sys.stderr,
-        )
         return None
 
     tarball = "/tmp/pokebase-data.tar.gz"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REGION="${1:-us-east-1}"
+REGION="${1:-ap-south-1}"
 REPO_NAME="pokebase"
 
 echo "Creating ECR repository '$REPO_NAME' in $REGION..."
