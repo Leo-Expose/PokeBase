@@ -139,7 +139,10 @@ def main() -> None:
     with tarfile.open(tarball) as tf:
         tf.extractall(TARGET, filter="data")
 
-    os.remove(tarball)
+    try:
+        os.remove(tarball)
+    except OSError:
+        pass  # might be a bind mount — not critical
 
     if os.path.exists(DB_PATH):
         print(f"Data ready! ({os.path.getsize(DB_PATH) // 1024 // 1024} MB database)")

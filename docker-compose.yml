@@ -9,6 +9,7 @@ services:
     volumes:
       - pokebase-data:/app/data
       - pokebase-sprites:/app/static/sprites
+      - ./pokebase-data.tar.gz:/app/pokebase-data.tar.gz
 
 volumes:
   pokebase-data:
